@@ -1,4 +1,4 @@
-package com.example.systemallica.gallery;
+package com.systemallica.gallery;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -14,10 +14,12 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.GridView;
+
+import com.example.systemallica.gallery.R;
 
 import java.io.File;
 import java.util.ArrayList;

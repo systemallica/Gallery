@@ -1,4 +1,4 @@
-package com.example.systemallica.gallery;
+package com.systemallica.gallery;
 
 import android.app.Activity;
 import android.content.Context;
@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.example.systemallica.gallery.R;
 
 import java.util.ArrayList;
 
@@ -45,7 +47,7 @@ class GridViewAdapter extends ArrayAdapter {
         return row;
     }
 
-    static class ViewHolder {
+    private static class ViewHolder {
         TextView imageTitle;
         ImageView image;
     }

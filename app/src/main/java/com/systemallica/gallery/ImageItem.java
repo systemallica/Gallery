@@ -1,4 +1,4 @@
-package com.example.systemallica.gallery;
+package com.systemallica.gallery;
 
 import android.graphics.Bitmap;
 
