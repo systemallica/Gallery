@@ -9,8 +9,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.systemallica.gallery.R;
-
 import java.util.ArrayList;
 
 class GridViewAdapter extends ArrayAdapter {

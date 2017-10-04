@@ -14,12 +14,11 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.GridView;
-
-import com.example.systemallica.gallery.R;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -99,10 +98,13 @@ public class MainActivity extends AppCompatActivity {
         // Define the cursor and get path and bitmap of images
         Uri uri;
         ArrayList<ImageItem> list_of_all_images = new ArrayList<>();
+        ArrayList<ImageItem> list_of_folder_images = new ArrayList<>();
+        ArrayList<String> list_of_folders = new ArrayList<>();
         Cursor cursor;
         int column_index_data;
-        //int column_index_folder_name;
+        int column_index_folder_name;
         String path_of_image;
+        String folder_name;
 
         uri = android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
 
@@ -113,23 +115,31 @@ public class MainActivity extends AppCompatActivity {
                 null, null);
 
         column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-        //column_index_folder_name = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
+        column_index_folder_name = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
+
+
         while (cursor.moveToNext()) {
             path_of_image = cursor.getString(column_index_data);
+            folder_name = cursor.getString(column_index_folder_name);
 
-            // Get bitmap
-            File imgFile = new File(path_of_image);
-            Bitmap bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+            if(!list_of_folders.contains(folder_name)){
+                Log.i("folder: ", folder_name);
+                list_of_folders.add(folder_name);
 
-            // Create object ImageItem. Add it to ArrayList.
-            list_of_all_images.add(new ImageItem(bitmap, path_of_image));
+                // Get bitmap
+                File imgFile = new File(path_of_image);
+                Log.i("path: ", path_of_image);
+                // OOM ERROR
+                Bitmap bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                list_of_folder_images.add(new ImageItem(bitmap, folder_name));
+            }
         }
         // Close the cursor
         cursor.close();
 
         // Find GridView to populate
         gridView = (GridView) findViewById(R.id.gridView);
-        gridAdapter = new GridViewAdapter(this, R.layout.grid_item_layout, list_of_all_images);
+        gridAdapter = new GridViewAdapter(this, R.layout.grid_item_layout, list_of_folder_images);
         gridView.setAdapter(gridAdapter);
 
 
