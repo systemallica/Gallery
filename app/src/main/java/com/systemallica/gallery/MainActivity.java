@@ -101,12 +101,12 @@ public class MainActivity extends AppCompatActivity {
         //TODO: count images in each folder
         //TODO: add number of images to textview
         //TODO: open folders
+        //TODO: fix requesting permissions
         GridView gridView;
         GridViewAdapter gridAdapter;
 
         // Define the cursor and get path and bitmap of images
         Uri uri;
-        //ArrayList<ImageItem> list_of_all_images = new ArrayList<>();
         ArrayList<ImageItem> list_of_folder_images = new ArrayList<>();
         ArrayList<String> list_of_folders = new ArrayList<>();
         Cursor cursor;
@@ -120,8 +120,7 @@ public class MainActivity extends AppCompatActivity {
         String[] projection = { MediaStore.MediaColumns.DATA,
                 MediaStore.Images.Media.BUCKET_DISPLAY_NAME };
 
-        cursor = getContentResolver().query(uri, projection, null,
-                null, null);
+        cursor = getContentResolver().query(uri, projection, null, null, null);
 
         if (cursor!= null) {
             column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
