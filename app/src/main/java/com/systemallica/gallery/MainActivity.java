@@ -127,11 +127,10 @@ public class MainActivity extends AppCompatActivity {
                 list_of_folders.add(folder_name);
 
                 // Get bitmap
-                File imgFile = new File(path_of_image);
+
                 Log.i("path: ", path_of_image);
                 // OOM ERROR
-                Bitmap bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-                list_of_folder_images.add(new ImageItem(bitmap, folder_name));
+                list_of_folder_images.add(new ImageItem(path_of_image, folder_name));
             }
         }
         // Close the cursor
