@@ -1,7 +1,9 @@
 package com.systemallica.gallery;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -26,6 +28,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
     final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL = 112;
+    final int MY_PERMISSIONS_REQUEST_CAMERA = 113;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,14 +37,16 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CAMERA},
+                    MY_PERMISSIONS_REQUEST_CAMERA);
+        }else{
+            setFABListener();
+        }
+
 
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -79,15 +84,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_READ_EXTERNAL: {
+            case MY_PERMISSIONS_REQUEST_READ_EXTERNAL:
                 // If request is cancelled, the result arrays are empty.
                 if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     loadImages();
-                }else{
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
                 }
-            }
+
+            case MY_PERMISSIONS_REQUEST_CAMERA:
+                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    setFABListener();
+                }
         }
     }
 
@@ -97,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Define the cursor and get path and bitmap of images
         Uri uri;
-        ArrayList<ImageItem> list_of_all_images = new ArrayList<>();
+        //ArrayList<ImageItem> list_of_all_images = new ArrayList<>();
         ArrayList<ImageItem> list_of_folder_images = new ArrayList<>();
         ArrayList<String> list_of_folders = new ArrayList<>();
         Cursor cursor;
@@ -114,34 +120,84 @@ public class MainActivity extends AppCompatActivity {
         cursor = getContentResolver().query(uri, projection, null,
                 null, null);
 
-        column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-        column_index_folder_name = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
+        if (cursor!= null) {
+            column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+            column_index_folder_name = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
 
 
-        while (cursor.moveToNext()) {
-            path_of_image = cursor.getString(column_index_data);
-            folder_name = cursor.getString(column_index_folder_name);
+            while (cursor.moveToNext()) {
+                path_of_image = cursor.getString(column_index_data);
+                folder_name = cursor.getString(column_index_folder_name);
 
-            if(!list_of_folders.contains(folder_name)){
-                Log.i("folder: ", folder_name);
-                list_of_folders.add(folder_name);
+                if (!list_of_folders.contains(folder_name)) {
+                    list_of_folders.add(folder_name);
 
-                // Get bitmap
+                    Log.i("path: ", path_of_image);
+                    File imgFile = new File(path_of_image);
 
-                Log.i("path: ", path_of_image);
-                // OOM ERROR
-                list_of_folder_images.add(new ImageItem(path_of_image, folder_name));
+                    BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inJustDecodeBounds = true;
+                    Bitmap bitmap = decodeSampledBitmapFromFile(imgFile, 100, 100);
+                    list_of_folder_images.add(new ImageItem(bitmap, folder_name));
+                }
             }
+            // Close the cursor
+            cursor.close();
         }
-        // Close the cursor
-        cursor.close();
 
         // Find GridView to populate
         gridView = (GridView) findViewById(R.id.gridView);
         gridAdapter = new GridViewAdapter(this, R.layout.grid_item_layout, list_of_folder_images);
         gridView.setAdapter(gridAdapter);
+    }
 
+    public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
 
+        Log.i("height: ", Integer.toString(options.outHeight));
+        Log.i("width: ", Integer.toString(options.outWidth));
+        Log.i("type: ", options.outMimeType);
 
+        if (height > reqHeight || width > reqWidth) {
+
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) > reqHeight
+                    && (halfWidth / inSampleSize) > reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
+    }
+
+    public static Bitmap decodeSampledBitmapFromFile(File file, int reqWidth, int reqHeight) {
+
+        // First decode with inJustDecodeBounds=true to check dimensions
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(file.getAbsolutePath(), options);
+        // Calculate inSampleSize
+        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+
+        // Decode bitmap with inSampleSize set
+        options.inJustDecodeBounds = false;
+        return BitmapFactory.decodeFile(file.getAbsolutePath(), options);
+    }
+    private void setFABListener() {
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+                startActivity(intent);
+            }
+        });
     }
 }

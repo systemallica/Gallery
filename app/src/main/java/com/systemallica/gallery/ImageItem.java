@@ -1,28 +1,23 @@
 package com.systemallica.gallery;
 
+import android.graphics.Bitmap;
+
 class ImageItem {
-    private String imagePath;
+    private Bitmap image;
     private String title;
 
-    ImageItem(String imagePath, String title) {
+    ImageItem(Bitmap image, String title) {
         super();
-        this.imagePath = imagePath;
+        this.image = image;
         this.title = title;
     }
 
-    String getImage() {
-        return imagePath;
-    }
-
-    public void setImage(String image) {
-        this.imagePath = image;
+    Bitmap getImage() {
+        return image;
     }
 
     String getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
 }
