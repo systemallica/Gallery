@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -96,6 +97,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void loadImages(){
+
+        //TODO: count images in each folder
+        //TODO: add number of images to textview
+        //TODO: open folders
         GridView gridView;
         GridViewAdapter gridAdapter;
 
@@ -122,7 +127,6 @@ public class MainActivity extends AppCompatActivity {
             column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
             column_index_folder_name = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
 
-
             while (cursor.moveToNext()) {
                 path_of_image = cursor.getString(column_index_data);
                 folder_name = cursor.getString(column_index_folder_name);
@@ -135,8 +139,11 @@ public class MainActivity extends AppCompatActivity {
 
                     BitmapFactory.Options options = new BitmapFactory.Options();
                     options.inJustDecodeBounds = true;
-                    Bitmap bitmap = decodeSampledBitmapFromFile(imgFile, 100, 100);
-                    list_of_folder_images.add(new ImageItem(bitmap, folder_name));
+                    // Sample original image
+                    Bitmap bitmap_sampled = decodeSampledBitmapFromFile(imgFile, 100, 100);
+                    // Generate thumbnail
+                    Bitmap bitmap_thumbnail = ThumbnailUtils.extractThumbnail(bitmap_sampled, 100, 100);
+                    list_of_folder_images.add(new ImageItem(bitmap_thumbnail, folder_name));
                 }
             }
             // Close the cursor
