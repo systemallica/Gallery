@@ -98,10 +98,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void loadImages(){
 
-        //TODO: count images in each folder
-        //TODO: add number of images to textview
         //TODO: open folders
         //TODO: fix requesting permissions
+        //TODO: set grid width/height dynamically
+
         GridView gridView;
         GridViewAdapter gridAdapter;
 
@@ -136,13 +136,16 @@ public class MainActivity extends AppCompatActivity {
                     Log.i("path: ", path_of_image);
                     File imgFile = new File(path_of_image);
 
+                    // Get number of pictures in folder
+                    int files_in_folder = imgFile.getParentFile().listFiles().length;
+                    // Avoid OOM error by extending allocated memory
                     BitmapFactory.Options options = new BitmapFactory.Options();
                     options.inJustDecodeBounds = true;
                     // Sample original image
                     Bitmap bitmap_sampled = decodeSampledBitmapFromFile(imgFile, 100, 100);
                     // Generate thumbnail
                     Bitmap bitmap_thumbnail = ThumbnailUtils.extractThumbnail(bitmap_sampled, 100, 100);
-                    list_of_folder_images.add(new ImageItem(bitmap_thumbnail, folder_name));
+                    list_of_folder_images.add(new ImageItem(bitmap_thumbnail, folder_name, files_in_folder));
                 }
             }
             // Close the cursor
@@ -160,10 +163,6 @@ public class MainActivity extends AppCompatActivity {
         final int height = options.outHeight;
         final int width = options.outWidth;
         int inSampleSize = 1;
-
-        Log.i("height: ", Integer.toString(options.outHeight));
-        Log.i("width: ", Integer.toString(options.outWidth));
-        Log.i("type: ", options.outMimeType);
 
         if (height > reqHeight || width > reqWidth) {
 
@@ -194,6 +193,7 @@ public class MainActivity extends AppCompatActivity {
         options.inJustDecodeBounds = false;
         return BitmapFactory.decodeFile(file.getAbsolutePath(), options);
     }
+
     private void setFABListener() {
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
