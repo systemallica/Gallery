@@ -12,6 +12,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Locale;
+
+import static com.systemallica.gallery.Utils.dpToPx;
 
 class GridViewAdapter extends ArrayAdapter<ImageItem> {
     private Context context;
@@ -48,16 +51,17 @@ class GridViewAdapter extends ArrayAdapter<ImageItem> {
         DisplayMetrics displayMetrics = getContext().getResources().getDisplayMetrics();
         //float dpHeight = displayMetrics.heightPixels / displayMetrics.density;
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+        int pxWidth = dpToPx((int)dpWidth, getContext());
 
         // Change image size
-        //holder.image.getLayoutParams().height = dpToPx((int)dpWidth, getContext());
-        //holder.image.getLayoutParams().width = dpToPx((int)dpWidth, getContext());
+        holder.image.getLayoutParams().height = pxWidth/2;
+        holder.image.getLayoutParams().width = pxWidth/2;
         // Change text container size
-        //lv.getLayoutParams().width = dpToPx((int)dpWidth, getContext());
+        lv.getLayoutParams().width = pxWidth/2;
 
         ImageItem item = (ImageItem) data.get(position);
         holder.imageTitle.setText(item.getTitle());
-        holder.imageCount.setText(Integer.toString(item.getCount()));
+        holder.imageCount.setText(String.format(Locale.ENGLISH, "%d", item.getCount()));
         holder.image.setImageBitmap(item.getImage());
         return row;
     }
@@ -66,10 +70,5 @@ class GridViewAdapter extends ArrayAdapter<ImageItem> {
         ImageView image;
         TextView imageTitle;
         TextView imageCount;
-    }
-
-    private static int dpToPx(int dp, Context context) {
-        float density = context.getResources().getDisplayMetrics().density;
-        return Math.round((float) dp * density);
     }
 }

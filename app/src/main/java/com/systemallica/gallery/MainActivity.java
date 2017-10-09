@@ -2,19 +2,19 @@ package com.systemallica.gallery;
 
 import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,10 +24,12 @@ import android.widget.GridView;
 import java.io.File;
 import java.util.ArrayList;
 
+import static android.content.pm.PackageManager.PERMISSION_GRANTED;
+import static com.systemallica.gallery.Utils.dpToPx;
+
 public class MainActivity extends AppCompatActivity {
 
-    final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL = 112;
-    final int MY_PERMISSIONS_REQUEST_CAMERA = 113;
+    final int MY_PERMISSIONS_REQUEST_BOTH= 114;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,25 +38,21 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.CAMERA},
-                    MY_PERMISSIONS_REQUEST_CAMERA);
-        }else{
-            setFABListener();
-        }
-
-
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-
-                    ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                            MY_PERMISSIONS_REQUEST_READ_EXTERNAL);
-        }else{
-            loadImages();
+        //Check for sdk >= 23
+        if (Build.VERSION.SDK_INT >= 23) {
+            //Check CAMERA and MEDIA permission
+            if (checkSelfPermission(Manifest.permission.CAMERA)!= PERMISSION_GRANTED
+                    || checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)!=
+                    PERMISSION_GRANTED ) {
+                requestPermissions(new String[]{
+                                Manifest.permission.CAMERA,
+                                Manifest.permission.READ_EXTERNAL_STORAGE},
+                        MY_PERMISSIONS_REQUEST_BOTH);
+            //Check CAMERA permission
+            }else{
+                setFABListener();
+                loadImages();
+            }
         }
     }
 
@@ -83,15 +81,18 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_READ_EXTERNAL:
-                // If request is cancelled, the result arrays are empty.
-                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    loadImages();
-                }
-
-            case MY_PERMISSIONS_REQUEST_CAMERA:
-                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            case MY_PERMISSIONS_REQUEST_BOTH:
+                if(grantResults.length > 0 && grantResults[0] == PERMISSION_GRANTED
+                        && grantResults[1] == PERMISSION_GRANTED) {
                     setFABListener();
+                    loadImages();
+                }else if (grantResults.length > 0 && grantResults[1] == PERMISSION_GRANTED){
+                    Snackbar.make(findViewById(R.id.main), "Camera button won't work", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                    loadImages();
+                }else{
+                    Snackbar.make(findViewById(R.id.main), "App can't work... closing", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
                 }
         }
     }
@@ -99,7 +100,6 @@ public class MainActivity extends AppCompatActivity {
     public void loadImages(){
 
         //TODO: open folders
-        //TODO: fix requesting permissions
         //TODO: set grid width/height dynamically
 
         GridView gridView;
@@ -123,8 +123,15 @@ public class MainActivity extends AppCompatActivity {
         cursor = getContentResolver().query(uri, projection, null, null, null);
 
         if (cursor!= null) {
+            // Get path of image
             column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+            // Get folder name
             column_index_folder_name = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
+
+            // Get width in dp and px
+            DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+            float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+            int pxWidth = dpToPx((int)dpWidth, this);
 
             while (cursor.moveToNext()) {
                 path_of_image = cursor.getString(column_index_data);
@@ -142,9 +149,9 @@ public class MainActivity extends AppCompatActivity {
                     BitmapFactory.Options options = new BitmapFactory.Options();
                     options.inJustDecodeBounds = true;
                     // Sample original image
-                    Bitmap bitmap_sampled = decodeSampledBitmapFromFile(imgFile, 100, 100);
+                    Bitmap bitmap_sampled = decodeSampledBitmapFromFile(imgFile, pxWidth, pxWidth);
                     // Generate thumbnail
-                    Bitmap bitmap_thumbnail = ThumbnailUtils.extractThumbnail(bitmap_sampled, 100, 100);
+                    Bitmap bitmap_thumbnail = ThumbnailUtils.extractThumbnail(bitmap_sampled, pxWidth, pxWidth);
                     list_of_folder_images.add(new ImageItem(bitmap_thumbnail, folder_name, files_in_folder));
                 }
             }
