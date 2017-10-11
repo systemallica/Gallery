@@ -11,6 +11,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -68,6 +70,7 @@ class GridViewAdapter extends ArrayAdapter<ImageItem> {
         .asBitmap()
         .load(item.getImage())
         .thumbnail(0.1f)
+        .centerCrop()
         .diskCacheStrategy(DiskCacheStrategy.ALL)
         .into(holder.image);
 

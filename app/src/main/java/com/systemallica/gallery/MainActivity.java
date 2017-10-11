@@ -131,11 +131,6 @@ public class MainActivity extends AppCompatActivity {
             // Get folder name
             column_index_folder_name = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
 
-            // Get width in dp and px
-            //DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-            //float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-            //int pxWidth = dpToPx((int)dpWidth, this);
-
             while (cursor.moveToNext()) {
                 path_of_image = cursor.getString(column_index_data);
                 folder_name = cursor.getString(column_index_folder_name);
@@ -148,13 +143,7 @@ public class MainActivity extends AppCompatActivity {
 
                     // Get number of pictures in folder
                     int files_in_folder = imgFile.getParentFile().listFiles().length;
-                    // Avoid OOM error by extending allocated memory
-                    //BitmapFactory.Options options = new BitmapFactory.Options();
-                    //options.inJustDecodeBounds = true;
-                    // Sample original image
-                    //Bitmap bitmap_sampled = decodeSampledBitmapFromFile(imgFile, pxWidth, pxWidth);
-                    // Generate thumbnail
-                    //Bitmap bitmap_thumbnail = ThumbnailUtils.extractThumbnail(bitmap_sampled, pxWidth, pxWidth);
+                    // Add to list
                     list_of_folder_images.add(new ImageItem(imgFile, folder_name, files_in_folder));
                 }
             }
@@ -168,42 +157,6 @@ public class MainActivity extends AppCompatActivity {
         gridAdapter = new GridViewAdapter(this, R.layout.grid_item_layout, list_of_folder_images);
         gridView.setAdapter(gridAdapter);
     }
-
-    //public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
-    //    // Raw height and width of image
-    //    final int height = options.outHeight;
-    //    final int width = options.outWidth;
-    //    int inSampleSize = 1;
-    //
-    //    if (height > reqHeight || width > reqWidth) {
-    //
-    //        final int halfHeight = height / 2;
-    //        final int halfWidth = width / 2;
-    //
-    //        // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-    //        // height and width larger than the requested height and width.
-    //        while ((halfHeight / inSampleSize) > reqHeight
-    //                && (halfWidth / inSampleSize) > reqWidth) {
-    //            inSampleSize *= 2;
-    //        }
-    //    }
-    //
-    //    return inSampleSize;
-    //}
-
-    //public static Bitmap decodeSampledBitmapFromFile(File file, int reqWidth, int reqHeight) {
-    //
-    //    // First decode with inJustDecodeBounds=true to check dimensions
-    //    final BitmapFactory.Options options = new BitmapFactory.Options();
-    //    options.inJustDecodeBounds = true;
-    //    BitmapFactory.decodeFile(file.getAbsolutePath(), options);
-    //    // Calculate inSampleSize
-    //    options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
-    //
-    //    // Decode bitmap with inSampleSize set
-    //    options.inJustDecodeBounds = false;
-    //    return BitmapFactory.decodeFile(file.getAbsolutePath(), options);
-    //}
 
     private void setFABListener() {
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
