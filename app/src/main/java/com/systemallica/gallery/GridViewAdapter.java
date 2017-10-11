@@ -11,8 +11,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -65,9 +63,12 @@ class GridViewAdapter extends ArrayAdapter<ImageItem> {
         holder.imageTitle.setText(item.getTitle());
         holder.imageCount.setText(String.format(Locale.ENGLISH, "%d", item.getCount()));
 
-        Glide
+        GlideApp
         .with(getContext())
+        .asBitmap()
         .load(item.getImage())
+        .thumbnail(0.1f)
+        .diskCacheStrategy(DiskCacheStrategy.ALL)
         .into(holder.image);
 
         return row;
