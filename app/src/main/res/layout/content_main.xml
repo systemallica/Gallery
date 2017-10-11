@@ -12,10 +12,9 @@
         android:id="@+id/gridView"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:columnWidth="180dp"
         android:drawSelectorOnTop="true"
         android:gravity="center"
-        android:numColumns="auto_fit"
+        android:numColumns="2"
         android:stretchMode="columnWidth"
         android:focusable="true"
         android:clickable="true"/>

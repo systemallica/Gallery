@@ -93,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
                 }else{
                     Snackbar.make(findViewById(R.id.main), "App can't work... closing", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
+                    System.exit(0);
                 }
         }
     }
@@ -101,6 +102,8 @@ public class MainActivity extends AppCompatActivity {
 
         //TODO: open folders
         //TODO: set grid width/height dynamically
+        //TODO: get videos
+        //TODO: add DB(?)
 
         GridView gridView;
         GridViewAdapter gridAdapter;
@@ -161,6 +164,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Find GridView to populate
         gridView = (GridView) findViewById(R.id.gridView);
+        gridView.setNumColumns(3);
         gridAdapter = new GridViewAdapter(this, R.layout.grid_item_layout, list_of_folder_images);
         gridView.setAdapter(gridAdapter);
     }

@@ -5,13 +5,13 @@
 
     <ImageView
         android:id="@+id/image"
-        android:layout_width="180dp"
-        android:layout_height="180dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:contentDescription="@string/desc_folder"/>
 
     <LinearLayout
         android:id="@+id/text_layout"
-        android:layout_width="180dp"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"

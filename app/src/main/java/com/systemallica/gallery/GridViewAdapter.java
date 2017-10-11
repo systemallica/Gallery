@@ -54,10 +54,10 @@ class GridViewAdapter extends ArrayAdapter<ImageItem> {
         int pxWidth = dpToPx((int)dpWidth, getContext());
 
         // Change image size
-        holder.image.getLayoutParams().height = pxWidth/2;
-        holder.image.getLayoutParams().width = pxWidth/2;
+        holder.image.getLayoutParams().height = pxWidth/3;
+        holder.image.getLayoutParams().width = pxWidth/3;
         // Change text container size
-        lv.getLayoutParams().width = pxWidth/2;
+        lv.getLayoutParams().width = pxWidth/3;
 
         ImageItem item = (ImageItem) data.get(position);
         holder.imageTitle.setText(item.getTitle());
