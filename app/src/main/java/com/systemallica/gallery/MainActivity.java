@@ -26,6 +26,7 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 public class MainActivity extends AppCompatActivity {
 
     final int MY_PERMISSIONS_REQUEST_BOTH= 114;
+    int columns = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
             //Check CAMERA permission
             }else{
                 setFABListener();
-                loadImages();
+                loadImages(columns);
             }
         }
     }
@@ -66,9 +67,17 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch(id){
+            case R.id.action_settings:
+                Snackbar.make(findViewById(R.id.main), "Settings", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            case R.id.action_increase_column:
+                columns++;
+                loadImages(columns);
+            case R.id.action_decrease_column:
+                columns--;
+                loadImages(columns);
+            default:
         }
 
         return super.onOptionsItemSelected(item);
@@ -81,11 +90,11 @@ public class MainActivity extends AppCompatActivity {
                 if(grantResults.length > 0 && grantResults[0] == PERMISSION_GRANTED
                         && grantResults[1] == PERMISSION_GRANTED) {
                     setFABListener();
-                    loadImages();
+                    loadImages(columns);
                 }else if (grantResults.length > 0 && grantResults[1] == PERMISSION_GRANTED){
                     Snackbar.make(findViewById(R.id.main), "Camera button won't work", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
-                    loadImages();
+                    loadImages(columns);
                 }else{
                     Snackbar.make(findViewById(R.id.main), "App can't work... closing", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
@@ -94,12 +103,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void loadImages(){
+    public void loadImages(int columns){
 
         //TODO: open folders
-        //TODO: set grid width/height dynamically
         //TODO: get videos
         //TODO: add DB(?)
+        //TODO: sort folder/media
+
 
         GridView gridView;
         GridViewAdapter gridAdapter;
@@ -149,8 +159,10 @@ public class MainActivity extends AppCompatActivity {
 
         // Find GridView to populate
         gridView = (GridView) findViewById(R.id.gridView);
-        gridView.setNumColumns(3);
-        gridAdapter = new GridViewAdapter(this, R.layout.grid_item_layout, list_of_folder_images);
+        // Set number of columns
+        gridView.setNumColumns(columns);
+        // Create and set the adapter (context, layout_of_image, list_of_folders)
+        gridAdapter = new GridViewAdapter(this, R.layout.grid_item_layout, list_of_folder_images, columns);
         gridView.setAdapter(gridAdapter);
     }
 

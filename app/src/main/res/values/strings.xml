@@ -1,5 +1,9 @@
 <resources>
     <string name="app_name">Gallery</string>
+
     <string name="action_settings">Settings</string>
+    <string name="action_increase_columns">Add column</string>
+    <string name="action_decrease_columns">Remove column</string>
+
     <string name="desc_folder">Folder thumbnail</string>
 </resources>

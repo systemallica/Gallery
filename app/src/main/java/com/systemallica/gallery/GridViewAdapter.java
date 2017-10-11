@@ -23,12 +23,14 @@ class GridViewAdapter extends ArrayAdapter<ImageItem> {
     private Context context;
     private int layoutResourceId;
     private ArrayList data = new ArrayList();
+    private int columns;
 
-    GridViewAdapter(Context context, int layoutResourceId, ArrayList<ImageItem> data) {
+    GridViewAdapter(Context context, int layoutResourceId, ArrayList<ImageItem> data, int n_columns) {
         super(context, 0, data);
         this.layoutResourceId = layoutResourceId;
         this.context = context;
         this.data = data;
+        this.columns = n_columns;
     }
 
     @Override
@@ -57,15 +59,17 @@ class GridViewAdapter extends ArrayAdapter<ImageItem> {
         int pxWidth = dpToPx((int)dpWidth, getContext());
 
         // Change image size
-        holder.image.getLayoutParams().height = pxWidth/3;
-        holder.image.getLayoutParams().width = pxWidth/3;
+        holder.image.getLayoutParams().height = pxWidth/columns;
+        holder.image.getLayoutParams().width = pxWidth/columns;
         // Change text container size
-        lv.getLayoutParams().width = pxWidth/3;
+        lv.getLayoutParams().width = pxWidth/columns;
 
+        // Get current ImageItem
         ImageItem item = (ImageItem) data.get(position);
+        // Set title and count
         holder.imageTitle.setText(item.getTitle());
         holder.imageCount.setText(String.format(Locale.ENGLISH, "%d", item.getCount()));
-
+        // Set image as bitmap, thumnail to 0.1x resolution
         GlideApp
         .with(getContext())
         .asBitmap()
