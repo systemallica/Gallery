@@ -35,9 +35,9 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //Check for sdk >= 23
+        // Check for sdk >= 23
         if (Build.VERSION.SDK_INT >= 23) {
-            //Check CAMERA and MEDIA permission
+            // Check CAMERA and MEDIA permission
             if (checkSelfPermission(Manifest.permission.CAMERA)!= PERMISSION_GRANTED
                     || checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)!=
                     PERMISSION_GRANTED ) {
@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
                                 Manifest.permission.CAMERA,
                                 Manifest.permission.READ_EXTERNAL_STORAGE},
                         MY_PERMISSIONS_REQUEST_BOTH);
-            //Check CAMERA permission
+            // When permissions are granted
             }else{
                 setFABListener();
                 loadImages(columns);
@@ -78,13 +78,15 @@ public class MainActivity extends AppCompatActivity {
                 columns--;
                 loadImages(columns);
             default:
+                // Nothing
         }
 
         return super.onOptionsItemSelected(item);
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
+                                           @NonNull int[] grantResults) {
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_BOTH:
                 if(grantResults.length > 0 && grantResults[0] == PERMISSION_GRANTED
@@ -92,12 +94,12 @@ public class MainActivity extends AppCompatActivity {
                     setFABListener();
                     loadImages(columns);
                 }else if (grantResults.length > 0 && grantResults[1] == PERMISSION_GRANTED){
-                    Snackbar.make(findViewById(R.id.main), "Camera button won't work", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
+                    Snackbar.make(findViewById(R.id.main), "Camera button won't work",
+                            Snackbar.LENGTH_LONG).setAction("Action", null).show();
                     loadImages(columns);
                 }else{
-                    Snackbar.make(findViewById(R.id.main), "App can't work... closing", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
+                    Snackbar.make(findViewById(R.id.main), "App can't work... closing",
+                            Snackbar.LENGTH_LONG).setAction("Action", null).show();
                     System.exit(0);
                 }
         }
@@ -129,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
         String[] projection = { MediaStore.MediaColumns.DATA,
                 MediaStore.Images.Media.BUCKET_DISPLAY_NAME };
 
-        cursor = getContentResolver().query(uri, projection, null, null, null);
+        cursor = getContentResolver().query(uri, projection, null, null, MediaStore.MediaColumns.TITLE);
 
         if (cursor!= null) {
             // Get path of image
@@ -162,7 +164,8 @@ public class MainActivity extends AppCompatActivity {
         // Set number of columns
         gridView.setNumColumns(columns);
         // Create and set the adapter (context, layout_of_image, list_of_folders)
-        gridAdapter = new GridViewAdapter(this, R.layout.grid_item_layout, list_of_folder_images, columns);
+        gridAdapter = new GridViewAdapter(this, R.layout.grid_item_layout, list_of_folder_images,
+                                          columns);
         gridView.setAdapter(gridAdapter);
     }
 

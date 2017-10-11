@@ -69,7 +69,7 @@ class GridViewAdapter extends ArrayAdapter<ImageItem> {
         // Set title and count
         holder.imageTitle.setText(item.getTitle());
         holder.imageCount.setText(String.format(Locale.ENGLISH, "%d", item.getCount()));
-        // Set image as bitmap, thumnail to 0.1x resolution
+        // Set image as bitmap, thumbnail to 0.1x resolution, center-cropped, cached
         GlideApp
         .with(getContext())
         .asBitmap()
