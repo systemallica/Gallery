@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.GridView;
 
 import java.io.File;
@@ -48,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
             // When permissions are granted
             }else{
                 setFABListener();
-                loadImages(columns);
+                loadFolders(columns);
             }
         }
     }
@@ -75,13 +76,13 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_increase_column:
                 if(columns<6) {
                     columns++;
-                    loadImages(columns);
+                    loadFolders(columns);
                 }
                 return true;
             case R.id.action_decrease_column:
                 if(columns>1) {
                     columns--;
-                    loadImages(columns);
+                    loadFolders(columns);
                 }
                 return true;
             default:
@@ -97,11 +98,11 @@ public class MainActivity extends AppCompatActivity {
                 if(grantResults.length > 0 && grantResults[0] == PERMISSION_GRANTED
                         && grantResults[1] == PERMISSION_GRANTED) {
                     setFABListener();
-                    loadImages(columns);
+                    loadFolders(columns);
                 }else if (grantResults.length > 0 && grantResults[1] == PERMISSION_GRANTED){
                     Snackbar.make(findViewById(R.id.main), "Camera button won't work",
                             Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                    loadImages(columns);
+                    loadFolders(columns);
                 }else{
                     Snackbar.make(findViewById(R.id.main), "App can't work... closing",
                             Snackbar.LENGTH_LONG).setAction("Action", null).show();
@@ -110,32 +111,33 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void loadImages(int columns){
+    public void loadFolders(int columns){
 
-        //TODO: open folders
+        //TODO: open and close folders
         //TODO: get videos
-        //TODO: add DB(?)
         //TODO: sort folder/media
-
         GridView gridView;
         GridViewAdapter gridAdapter;
 
         // Define the cursor and get path and bitmap of images
         Uri uri;
-        ArrayList<ImageItem> list_of_folder_images = new ArrayList<>();
-        ArrayList<String> list_of_folders = new ArrayList<>();
+        ArrayList<ImageItem> list_of_folders = new ArrayList<>();
+        ArrayList<String> list_of_folder_names = new ArrayList<>();
         Cursor cursor;
         int column_index_data;
         int column_index_folder_name;
         String path_of_image;
+        String path_of_video;
         String folder_name;
 
-        uri = android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+        // Images-----------------------------------------------------------------------------------
 
-        String[] projection = { MediaStore.MediaColumns.DATA,
+        uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+
+        String[] projection_i = { MediaStore.MediaColumns.DATA,
                 MediaStore.Images.Media.BUCKET_DISPLAY_NAME };
 
-        cursor = getContentResolver().query(uri, projection, null, null, MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
+        cursor = getContentResolver().query(uri, projection_i, null, null, MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
 
         if (cursor!= null) {
             // Get path of image
@@ -147,8 +149,8 @@ public class MainActivity extends AppCompatActivity {
                 path_of_image = cursor.getString(column_index_data);
                 folder_name = cursor.getString(column_index_folder_name);
 
-                if (!list_of_folders.contains(folder_name)) {
-                    list_of_folders.add(folder_name);
+                if (!list_of_folder_names.contains(folder_name)) {
+                    list_of_folder_names.add(folder_name);
 
                     Log.i("path: ", path_of_image);
                     File imgFile = new File(path_of_image);
@@ -156,7 +158,41 @@ public class MainActivity extends AppCompatActivity {
                     // Get number of pictures in folder
                     int files_in_folder = imgFile.getParentFile().listFiles().length;
                     // Add to list
-                    list_of_folder_images.add(new ImageItem(imgFile, folder_name, files_in_folder));
+                    list_of_folders.add(new ImageItem(imgFile, folder_name, files_in_folder));
+                }
+            }
+            // Close the cursor
+            cursor.close();
+        }
+
+        // Videos-----------------------------------------------------------------------------------
+        uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+
+        String[] projection_v = { MediaStore.MediaColumns.DATA,
+                MediaStore.Video.Media.BUCKET_DISPLAY_NAME };
+
+        cursor = getContentResolver().query(uri, projection_v, null, null, MediaStore.Video.Media.BUCKET_DISPLAY_NAME);
+
+        if (cursor!= null) {
+            // Get path of video
+            column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+            // Get folder name
+            column_index_folder_name = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.BUCKET_DISPLAY_NAME);
+
+            while (cursor.moveToNext()) {
+                path_of_video = cursor.getString(column_index_data);
+                folder_name = cursor.getString(column_index_folder_name);
+
+                if (!list_of_folder_names.contains(folder_name)) {
+                    list_of_folder_names.add(folder_name);
+
+                    Log.i("path: ", path_of_video);
+                    File imgFile = new File(path_of_video);
+
+                    // Get number of pictures in folder
+                    int files_in_folder = imgFile.getParentFile().listFiles().length;
+                    // Add to list
+                    list_of_folders.add(new ImageItem(imgFile, folder_name, files_in_folder));
                 }
             }
             // Close the cursor
@@ -168,9 +204,19 @@ public class MainActivity extends AppCompatActivity {
         // Set number of columns
         gridView.setNumColumns(columns);
         // Create and set the adapter (context, layout_of_image, list_of_folders)
-        gridAdapter = new GridViewAdapter(this, R.layout.grid_item_layout, list_of_folder_images,
+        gridAdapter = new GridViewAdapter(this, R.layout.grid_item_layout, list_of_folders,
                                           columns);
         gridView.setAdapter(gridAdapter);
+
+        setFABScrollListener();
+    }
+
+    private void sortFolders(String type){
+
+    }
+
+    private void openFolder(String folder_name){
+
     }
 
     private void setFABListener() {
@@ -180,6 +226,28 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
                 startActivity(intent);
+            }
+        });
+    }
+
+    private void setFABScrollListener(){
+        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        GridView gridView = (GridView) findViewById(R.id.gridView);
+
+        gridView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            // Called at end of scrolling action
+            public void onScroll (AbsListView view, int firstVisibleItem, int visibleItemCount,
+                                  int totalItemCount) {
+                //fab.show();
+            }
+
+            // Called at beginning of scrolling action
+            public void onScrollStateChanged(AbsListView view, int scrollState){
+                if (scrollState == SCROLL_STATE_IDLE){
+                    fab.show();
+                }else{
+                    fab.hide();
+                }
             }
         });
     }

@@ -72,7 +72,6 @@ class GridViewAdapter extends ArrayAdapter<ImageItem> {
         // Set image as bitmap, thumbnail to 0.1x resolution, center-cropped, cached
         GlideApp
         .with(getContext())
-        .asBitmap()
         .load(item.getImage())
         .thumbnail(0.1f)
         .centerCrop()
