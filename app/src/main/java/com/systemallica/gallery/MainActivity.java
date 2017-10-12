@@ -71,17 +71,22 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_settings:
                 Snackbar.make(findViewById(R.id.main), "Settings", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+                return true;
             case R.id.action_increase_column:
-                columns++;
-                loadImages(columns);
+                if(columns<6) {
+                    columns++;
+                    loadImages(columns);
+                }
+                return true;
             case R.id.action_decrease_column:
-                columns--;
-                loadImages(columns);
+                if(columns>1) {
+                    columns--;
+                    loadImages(columns);
+                }
+                return true;
             default:
-                // Nothing
+                return super.onOptionsItemSelected(item);
         }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -112,7 +117,6 @@ public class MainActivity extends AppCompatActivity {
         //TODO: add DB(?)
         //TODO: sort folder/media
 
-
         GridView gridView;
         GridViewAdapter gridAdapter;
 
@@ -131,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
         String[] projection = { MediaStore.MediaColumns.DATA,
                 MediaStore.Images.Media.BUCKET_DISPLAY_NAME };
 
-        cursor = getContentResolver().query(uri, projection, null, null, MediaStore.MediaColumns.TITLE);
+        cursor = getContentResolver().query(uri, projection, null, null, MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
 
         if (cursor!= null) {
             // Get path of image
