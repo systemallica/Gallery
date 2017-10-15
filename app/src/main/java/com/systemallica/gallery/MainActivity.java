@@ -12,11 +12,11 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.GridView;
 
 import java.io.File;
@@ -116,13 +116,12 @@ public class MainActivity extends AppCompatActivity {
     public void loadFolders(int columns){
 
         //TODO: open and close folders
-        //TODO: sort folder/media
         GridView gridView;
-        GridViewAdapter gridAdapter;
+        GridViewAdapterFolders gridAdapter;
 
         // Define the cursor and get path and bitmap of images
         Uri uri;
-        ArrayList<ImageItem> list_of_folders = new ArrayList<>();
+        final ArrayList<FolderItem> list_of_folders = new ArrayList<>();
         ArrayList<String> list_of_folder_names = new ArrayList<>();
         Cursor cursor;
         int column_index_data;
@@ -153,13 +152,13 @@ public class MainActivity extends AppCompatActivity {
                 if (!list_of_folder_names.contains(folder_name)) {
                     list_of_folder_names.add(folder_name);
 
-                    Log.i("path: ", path_of_image);
+                    //Log.i("path: ", path_of_image);
                     File imgFile = new File(path_of_image);
 
                     // Get number of pictures in folder
                     int files_in_folder = imgFile.getParentFile().listFiles().length;
                     // Add to list
-                    list_of_folders.add(new ImageItem(imgFile, folder_name, files_in_folder));
+                    list_of_folders.add(new FolderItem(imgFile, folder_name, files_in_folder));
                 }
             }
             // Close the cursor
@@ -187,13 +186,13 @@ public class MainActivity extends AppCompatActivity {
                 if (!list_of_folder_names.contains(folder_name)) {
                     list_of_folder_names.add(folder_name);
 
-                    Log.i("path: ", path_of_video);
+                    //Log.i("path: ", path_of_video);
                     File imgFile = new File(path_of_video);
 
                     // Get number of pictures in folder
                     int files_in_folder = imgFile.getParentFile().listFiles().length;
                     // Add to list
-                    list_of_folders.add(new ImageItem(imgFile, folder_name, files_in_folder));
+                    list_of_folders.add(new FolderItem(imgFile, folder_name, files_in_folder));
                 }
             }
             // Close the cursor
@@ -207,22 +206,30 @@ public class MainActivity extends AppCompatActivity {
         // Set number of columns
         gridView.setNumColumns(columns);
         // Create and set the adapter (context, layout_of_image, list_of_folders)
-        gridAdapter = new GridViewAdapter(this, R.layout.grid_item_layout, list_of_folders,
+        gridAdapter = new GridViewAdapterFolders(this, R.layout.grid_item_layout_folder, list_of_folders,
                                           columns);
         gridView.setAdapter(gridAdapter);
+        // OnClick listener
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View v,
+                                    int position, long id) {
+
+                Intent intent = new Intent(getBaseContext(), Folder.class);
+                intent.putExtra("folder", list_of_folders.get(position).getTitle());
+                startActivity(intent);
+
+            }
+        });
 
         setFABScrollListener();
     }
 
-    private class SortFoldersByName implements Comparator<ImageItem> {
+    private class SortFoldersByName implements Comparator<FolderItem> {
         @Override
-        public int compare(ImageItem o1, ImageItem o2) {
+        public int compare(FolderItem o1, FolderItem o2) {
             return (o1.getTitle()).compareTo(o2.getTitle());
         }
-    }
-
-    private void openFolder(String folder_name){
-
     }
 
     private void setFABListener() {
@@ -246,7 +253,7 @@ public class MainActivity extends AppCompatActivity {
             // Called at end of scrolling action
             public void onScroll (AbsListView view, int firstVisibleItem, int visibleItemCount,
                                   int totalItemCount) {
-                //lol
+                // Do nothing
             }
 
             // Called at beginning of scrolling action

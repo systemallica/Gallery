@@ -19,13 +19,13 @@ import java.util.Locale;
 
 import static com.systemallica.gallery.Utils.dpToPx;
 
-class GridViewAdapter extends ArrayAdapter<ImageItem> {
+class GridViewAdapterFolders extends ArrayAdapter<FolderItem> {
     private Context context;
     private int layoutResourceId;
     private ArrayList data = new ArrayList();
     private int columns;
 
-    GridViewAdapter(Context context, int layoutResourceId, ArrayList<ImageItem> data, int n_columns) {
+    GridViewAdapterFolders(Context context, int layoutResourceId, ArrayList<FolderItem> data, int n_columns) {
         super(context, 0, data);
         this.layoutResourceId = layoutResourceId;
         this.context = context;
@@ -64,19 +64,19 @@ class GridViewAdapter extends ArrayAdapter<ImageItem> {
         // Change text container size
         lv.getLayoutParams().width = pxWidth/columns;
 
-        // Get current ImageItem
-        ImageItem item = (ImageItem) data.get(position);
+        // Get current FolderItem
+        FolderItem item = (FolderItem) data.get(position);
         // Set title and count
         holder.imageTitle.setText(item.getTitle());
         holder.imageCount.setText(String.format(Locale.ENGLISH, "%d", item.getCount()));
-        // Set image as bitmap, thumbnail to 0.1x resolution, center-cropped, cached
+        // Set image, thumbnail to 0.1x resolution, center-cropped, cached
         GlideApp
-        .with(getContext())
-        .load(item.getImage())
-        .thumbnail(0.1f)
-        .centerCrop()
-        .diskCacheStrategy(DiskCacheStrategy.ALL)
-        .into(holder.image);
+                .with(context)
+                .load(item.getImage())
+                .thumbnail(0.1f)
+                .centerCrop()
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .into(holder.image);
 
         return row;
     }

@@ -6,4 +6,7 @@
     <string name="action_decrease_columns">Remove column</string>
 
     <string name="desc_folder">Folder thumbnail</string>
+    <string name="desc_image">Image thumbnail</string>
+
+    <string name="title_activity_folder">Folder</string>
 </resources>
