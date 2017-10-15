@@ -241,18 +241,28 @@ public class MainActivity extends AppCompatActivity {
         GridView gridView = (GridView) findViewById(R.id.gridView);
 
         gridView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            int mLastFirstVisibleItem;
+
             // Called at end of scrolling action
             public void onScroll (AbsListView view, int firstVisibleItem, int visibleItemCount,
                                   int totalItemCount) {
-                //fab.show();
+                //lol
             }
 
             // Called at beginning of scrolling action
             public void onScrollStateChanged(AbsListView view, int scrollState){
-                if (scrollState == SCROLL_STATE_IDLE){
-                    fab.show();
-                }else{
-                    fab.hide();
+
+                if (view.getId() == view.getId()) {
+                    final int currentFirstVisibleItem = view.getFirstVisiblePosition();
+                    if (currentFirstVisibleItem > mLastFirstVisibleItem) {
+                        // Scrolling down
+                        fab.hide();
+                    } else if (currentFirstVisibleItem < mLastFirstVisibleItem) {
+                        // Scrolling up
+                        fab.show();
+                    }
+
+                    mLastFirstVisibleItem = currentFirstVisibleItem;
                 }
             }
         });
