@@ -21,6 +21,8 @@ import android.widget.GridView;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
@@ -114,7 +116,6 @@ public class MainActivity extends AppCompatActivity {
     public void loadFolders(int columns){
 
         //TODO: open and close folders
-        //TODO: get videos
         //TODO: sort folder/media
         GridView gridView;
         GridViewAdapter gridAdapter;
@@ -137,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
         String[] projection_i = { MediaStore.MediaColumns.DATA,
                 MediaStore.Images.Media.BUCKET_DISPLAY_NAME };
 
-        cursor = getContentResolver().query(uri, projection_i, null, null, MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
+        cursor = getContentResolver().query(uri, projection_i, null, null, MediaStore.MediaColumns.DATE_ADDED + " DESC");
 
         if (cursor!= null) {
             // Get path of image
@@ -171,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
         String[] projection_v = { MediaStore.MediaColumns.DATA,
                 MediaStore.Video.Media.BUCKET_DISPLAY_NAME };
 
-        cursor = getContentResolver().query(uri, projection_v, null, null, MediaStore.Video.Media.BUCKET_DISPLAY_NAME);
+        cursor = getContentResolver().query(uri, projection_v, null, null, MediaStore.MediaColumns.DATE_ADDED + " DESC");
 
         if (cursor!= null) {
             // Get path of video
@@ -199,6 +200,8 @@ public class MainActivity extends AppCompatActivity {
             cursor.close();
         }
 
+        Collections.sort(list_of_folders, new SortFoldersByName());
+
         // Find GridView to populate
         gridView = (GridView) findViewById(R.id.gridView);
         // Set number of columns
@@ -211,8 +214,11 @@ public class MainActivity extends AppCompatActivity {
         setFABScrollListener();
     }
 
-    private void sortFolders(String type){
-
+    private class SortFoldersByName implements Comparator<ImageItem> {
+        @Override
+        public int compare(ImageItem o1, ImageItem o2) {
+            return (o1.getTitle()).compareTo(o2.getTitle());
+        }
     }
 
     private void openFolder(String folder_name){
