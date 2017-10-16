@@ -7,7 +7,10 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.transition.Slide;
+import android.view.Gravity;
 import android.view.View;
+import android.view.animation.LinearInterpolator;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
@@ -20,6 +23,7 @@ public class Folder extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_folder);
+        setupWindowAnimations();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -28,13 +32,20 @@ public class Folder extends AppCompatActivity {
         String folder = intent.getStringExtra("folder");
         loadImages(folder);
 
-
         if (getSupportActionBar() != null) {
             // Set title to folder name
             getSupportActionBar().setTitle(folder);
             // Display arrow to return to previous Activity
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+    }
+
+    private void setupWindowAnimations() {
+        Slide slide = new Slide();
+        slide.setInterpolator(new LinearInterpolator());
+        slide.setSlideEdge(Gravity.END);
+        getWindow().setEnterTransition(slide);
+        getWindow().setReturnTransition(slide);
     }
 
     @Override
