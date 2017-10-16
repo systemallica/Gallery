@@ -20,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -156,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
                     File imgFile = new File(path_of_image);
 
                     // Get number of pictures in folder
-                    int files_in_folder = imgFile.getParentFile().listFiles().length;
+                    int files_in_folder = imgFile.getParentFile().listFiles(new ImageFileFilter()).length;
                     // Add to list
                     list_of_folders.add(new FolderItem(imgFile, folder_name, files_in_folder));
                 }
@@ -190,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
                     File imgFile = new File(path_of_video);
 
                     // Get number of pictures in folder
-                    int files_in_folder = imgFile.getParentFile().listFiles().length;
+                    int files_in_folder = imgFile.getParentFile().listFiles(new VideoFileFilter()).length;
                     // Add to list
                     list_of_folders.add(new FolderItem(imgFile, folder_name, files_in_folder));
                 }
@@ -223,13 +224,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         setFABScrollListener();
-    }
-
-    private class SortFoldersByName implements Comparator<FolderItem> {
-        @Override
-        public int compare(FolderItem o1, FolderItem o2) {
-            return (o1.getTitle()).compareTo(o2.getTitle());
-        }
     }
 
     private void setFABListener() {
@@ -273,5 +267,39 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    // Filters
+    private class SortFoldersByName implements Comparator<FolderItem> {
+        @Override
+        public int compare(FolderItem o1, FolderItem o2) {
+            return (o1.getTitle()).compareTo(o2.getTitle());
+        }
+    }
+
+    private class ImageFileFilter implements FileFilter {
+        private final String[] okFileExtensions = new String[] { "jpg", "jpeg", "png", "gif" };
+
+        public boolean accept(File file) {
+            for (String extension : okFileExtensions) {
+                if (file.getName().toLowerCase().endsWith(extension)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    private class VideoFileFilter implements FileFilter {
+        private final String[] okFileExtensions = new String[] { "mp4" };
+
+        public boolean accept(File file) {
+            for (String extension : okFileExtensions) {
+                if (file.getName().toLowerCase().endsWith(extension)) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }
