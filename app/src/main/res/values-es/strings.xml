@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Galería</string>
+    <string name="action_decrease_columns">Quitar columna</string>
+    <string name="action_increase_columns">Añadir columna</string>
+    <string name="action_settings">Opciones</string>
+    <string name="desc_folder">Portada de carpeta</string>
+    <string name="desc_full_image">Imagen completa</string>
+    <string name="desc_image">Portada de imagen</string>
+    <string name="title_activity_folder">Carpeta</string>
+</resources>

@@ -229,7 +229,7 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
                 // Create intent
-                Intent intent = new Intent(getBaseContext(), Folder.class);
+                Intent intent = new Intent(getBaseContext(), FolderActivity.class);
                 intent.putExtra("folder", list_of_folders.get(position).getTitle());
                 // Allow transition
                 Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(MainActivity.this).toBundle();

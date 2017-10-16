@@ -17,7 +17,7 @@ import android.widget.GridView;
 import java.io.File;
 import java.util.ArrayList;
 
-public class Folder extends AppCompatActivity {
+public class FolderActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +35,7 @@ public class Folder extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             // Set title to folder name
             getSupportActionBar().setTitle(folder);
-            // Display arrow to return to previous Activity
+            // Display arrow to return to previous activity
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
     }
@@ -130,7 +130,11 @@ public class Folder extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
 
-               //Expand image
+                // Create intent
+                Intent intent = new Intent(getBaseContext(), ImageActivity.class);
+                intent.putExtra("image", list_of_images.get(position).getPath());
+                // Start activity
+                startActivity(intent);
 
             }
         });

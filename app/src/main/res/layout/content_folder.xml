@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.systemallica.gallery.Folder"
+    tools:context="com.systemallica.gallery.FolderActivity"
     tools:showIn="@layout/activity_folder">
 
     <GridView
