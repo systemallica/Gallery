@@ -7,10 +7,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.transition.Slide;
-import android.view.Gravity;
 import android.view.View;
-import android.view.animation.LinearInterpolator;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
@@ -23,7 +20,6 @@ public class FolderActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_folder);
-        setupWindowAnimations();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -38,14 +34,6 @@ public class FolderActivity extends AppCompatActivity {
             // Display arrow to return to previous activity
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-    }
-
-    private void setupWindowAnimations() {
-        Slide slide = new Slide();
-        slide.setInterpolator(new LinearInterpolator());
-        slide.setSlideEdge(Gravity.END);
-        getWindow().setEnterTransition(slide);
-        getWindow().setReturnTransition(slide);
     }
 
     @Override
@@ -135,7 +123,6 @@ public class FolderActivity extends AppCompatActivity {
                 intent.putExtra("image", list_of_images.get(position).getPath());
                 // Start activity
                 startActivity(intent);
-
             }
         });
     }
