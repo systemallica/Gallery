@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         // Check for sdk >= 23
@@ -116,7 +116,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void loadFolders(int columns){
 
-        //TODO: open and close folders
         GridView gridView;
         GridViewAdapterFolders gridAdapter;
 
@@ -203,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
         Collections.sort(list_of_folders, new SortFoldersByName());
 
         // Find GridView to populate
-        gridView = (GridView) findViewById(R.id.gridView);
+        gridView = findViewById(R.id.gridView);
         // Set number of columns
         gridView.setNumColumns(columns);
         // Create and set the adapter (context, layout_of_image, list_of_folders)
@@ -227,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setFABListener() {
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -238,8 +237,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setFABScrollListener(){
-        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        GridView gridView = (GridView) findViewById(R.id.gridView);
+        final FloatingActionButton fab = findViewById(R.id.fab);
+        GridView gridView = findViewById(R.id.gridView);
 
         gridView.setOnScrollListener(new AbsListView.OnScrollListener() {
             int mLastFirstVisibleItem;

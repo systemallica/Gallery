@@ -20,7 +20,7 @@ public class FolderActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_folder);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         // Get name of folder passed with the intent
@@ -49,7 +49,8 @@ public class FolderActivity extends AppCompatActivity {
 
         // Define the cursor and get path and bitmap of images
         Uri uri;
-        final ArrayList<File> list_of_images = new ArrayList<>();
+        final ArrayList<File> list_of_files = new ArrayList<>();
+        final ArrayList<String> list_of_paths = new ArrayList<>();
         Cursor cursor;
         int column_index_data;
         String path_of_image;
@@ -73,9 +74,10 @@ public class FolderActivity extends AppCompatActivity {
             while (cursor.moveToNext()) {
                 // Get file
                 path_of_image = cursor.getString(column_index_data);
+                list_of_paths.add(path_of_image);
                 File imgFile = new File(path_of_image);
                 // Add to list
-                list_of_images.add(imgFile);
+                list_of_files.add(imgFile);
 
             }
             // Close the cursor
@@ -99,18 +101,18 @@ public class FolderActivity extends AppCompatActivity {
                 path_of_video = cursor.getString(column_index_data);
                 File imgFile = new File(path_of_video);
                 // Add to list
-                list_of_images.add(imgFile);
+                list_of_files.add(imgFile);
             }
             // Close the cursor
             cursor.close();
         }
 
         // Find GridView to populate
-        gridView = (GridView) findViewById(R.id.gridViewFolder);
+        gridView = findViewById(R.id.gridViewFolder);
         // Set number of columns
         gridView.setNumColumns(3);
         // Create and set the adapter (context, layout_of_image, list_of_images)
-        gridAdapter = new GridViewAdapterImages(this, R.layout.grid_item_layout_image, list_of_images, 3);
+        gridAdapter = new GridViewAdapterImages(this, R.layout.grid_item_layout_image, list_of_files, 3);
         gridView.setAdapter(gridAdapter);
         // OnClick listener
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -120,7 +122,10 @@ public class FolderActivity extends AppCompatActivity {
 
                 // Create intent
                 Intent intent = new Intent(getBaseContext(), ImageActivity.class);
-                intent.putExtra("image", list_of_images.get(position).getPath());
+                // Pass image file, position in array, and array
+                intent.putExtra("image", list_of_files.get(position).getPath());
+                intent.putExtra("position", position);
+                intent.putExtra("list_of_images", list_of_paths);
                 // Start activity
                 startActivity(intent);
             }
