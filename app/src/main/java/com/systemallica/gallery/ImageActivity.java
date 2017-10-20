@@ -13,6 +13,8 @@ import com.github.pwittchen.swipe.library.SwipeListener;
 import java.io.File;
 import java.util.ArrayList;
 
+import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
+
 public class ImageActivity extends AppCompatActivity {
 
     private Swipe swipe;
@@ -46,6 +48,7 @@ public class ImageActivity extends AppCompatActivity {
         GlideApp
                 .with(this)
                 .load(image)
+                .transition(withCrossFade())
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into((ImageView)findViewById(R.id.image));
     }
@@ -76,6 +79,7 @@ public class ImageActivity extends AppCompatActivity {
                     GlideApp
                             .with(getApplicationContext())
                             .load(new File(list_of_images.get(position)))
+                            .transition(withCrossFade())
                             .diskCacheStrategy(DiskCacheStrategy.ALL)
                             .into((ImageView)findViewById(R.id.image));
                 }
@@ -93,6 +97,7 @@ public class ImageActivity extends AppCompatActivity {
                     GlideApp
                             .with(getApplicationContext())
                             .load(new File(list_of_images.get(position)))
+                            .transition(withCrossFade())
                             .diskCacheStrategy(DiskCacheStrategy.ALL)
                             .into((ImageView)findViewById(R.id.image));
                 }
