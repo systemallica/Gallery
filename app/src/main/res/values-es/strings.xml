@@ -8,4 +8,6 @@
     <string name="desc_full_image">Imagen completa</string>
     <string name="desc_image">Portada de imagen</string>
     <string name="title_activity_folder">Carpeta</string>
+    <string name="action_delete">Borrar</string>
+    <string name="title_activity_image">Imagen</string>
 </resources>

@@ -37,6 +37,8 @@ public class ImageActivity extends AppCompatActivity {
         Intent intent = getIntent();
         // Get all the images in the folder
         list_of_images = intent.getStringArrayListExtra("list_of_images");
+        // Get position
+        int position_intent = intent.getIntExtra("position", 0);
 
         // Instantiate a ViewPager and a PagerAdapter.
         mPagerAdapter = new CustomPagerAdapter(this);
@@ -44,12 +46,20 @@ public class ImageActivity extends AppCompatActivity {
 
         // Set the adapter
         mPager.setAdapter(mPagerAdapter);
+        // Set current position
+        mPager.setCurrentItem(position_intent);
 
         if (getSupportActionBar() != null) {
             // Display arrow to return to previous activity
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 
     class CustomPagerAdapter extends PagerAdapter {
@@ -108,17 +118,25 @@ public class ImageActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         switch(id){
             case R.id.delete:
-
+                //deleteImage(new File(list_of_images.get(position_array)));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void deleteImage(File image){
+        if (image.exists()) {
+            if (image.delete()) {
+                System.out.println("file Deleted :" + image.getPath());
+                finish();
+            } else {
+                System.out.println("file not Deleted :" + image.getPath());
+            }
         }
     }
 }

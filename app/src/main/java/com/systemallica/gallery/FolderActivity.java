@@ -18,7 +18,6 @@ public class FolderActivity extends AppCompatActivity {
 
     final ArrayList<File> list_of_files = new ArrayList<>();
     final ArrayList<String> list_of_paths = new ArrayList<>();
-    int position_array;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,10 +121,10 @@ public class FolderActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
 
-                position_array = position;
                 // Create intent
                 Intent intent = new Intent(getBaseContext(), ImageActivity.class);
                 // Pass arrayList of image paths
+                intent.putExtra("position", position);
                 intent.putExtra("list_of_images", list_of_paths);
                 // Start activity
                 startActivity(intent);
