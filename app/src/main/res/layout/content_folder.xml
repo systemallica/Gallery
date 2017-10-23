@@ -5,11 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.systemallica.gallery.MainActivity"
-    tools:showIn="@layout/activity_main">
+    tools:context="com.systemallica.gallery.FolderActivity"
+    tools:showIn="@layout/activity_folder">
 
     <GridView
-        android:id="@+id/gridView"
+        android:id="@+id/gridViewFolder"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:drawSelectorOnTop="true"

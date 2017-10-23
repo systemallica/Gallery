@@ -1,20 +1,20 @@
 package com.systemallica.gallery;
 
-import android.graphics.Bitmap;
+import java.io.File;
 
-class ImageItem {
-    private Bitmap image;
+class FolderItem {
+    private File image;
     private String title;
     private int    count;
 
-    ImageItem(Bitmap image, String title, int count) {
+    FolderItem(File image, String title, int count) {
         super();
         this.image = image;
         this.title = title;
         this.count = count;
     }
 
-    Bitmap getImage() {
+    File getImage() {
         return image;
     }
 

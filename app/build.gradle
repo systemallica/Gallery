@@ -5,22 +5,32 @@ android {
     buildToolsVersion "26.0.2"
     defaultConfig {
         applicationId "com.systemallica.gallery"
-        minSdkVersion 16
+        minSdkVersion 19
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 }
 
+repositories {
+    mavenCentral()
+    maven { url 'https://maven.google.com' }
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:26.0.0-alpha1'
+
+    compile 'com.android.support:appcompat-v7:26.1.0'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.android.support:design:26.0.0-alpha1'
+    compile 'com.android.support:design:26.1.0'
+    compile 'com.github.bumptech.glide:glide:4.2.0'
+    compile 'com.android.support:support-v4:26.1.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.2.0'
+
 }

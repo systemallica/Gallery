@@ -2,6 +2,7 @@ package com.systemallica.gallery;
 
 import android.app.Activity;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,25 +12,29 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+
 import java.util.ArrayList;
 import java.util.Locale;
 
 import static com.systemallica.gallery.Utils.dpToPx;
 
-class GridViewAdapter extends ArrayAdapter<ImageItem> {
+class GridViewAdapterFolders extends ArrayAdapter<FolderItem> {
     private Context context;
     private int layoutResourceId;
     private ArrayList data = new ArrayList();
+    private int columns;
 
-    GridViewAdapter(Context context, int layoutResourceId, ArrayList<ImageItem> data) {
+    GridViewAdapterFolders(Context context, int layoutResourceId, ArrayList<FolderItem> data, int n_columns) {
         super(context, 0, data);
         this.layoutResourceId = layoutResourceId;
         this.context = context;
         this.data = data;
+        this.columns = n_columns;
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    @NonNull public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         View row = convertView;
         ViewHolder holder;
 
@@ -54,15 +59,25 @@ class GridViewAdapter extends ArrayAdapter<ImageItem> {
         int pxWidth = dpToPx((int)dpWidth, getContext());
 
         // Change image size
-        holder.image.getLayoutParams().height = pxWidth/2;
-        holder.image.getLayoutParams().width = pxWidth/2;
+        holder.image.getLayoutParams().height = pxWidth/columns;
+        holder.image.getLayoutParams().width = pxWidth/columns;
         // Change text container size
-        lv.getLayoutParams().width = pxWidth/2;
+        lv.getLayoutParams().width = pxWidth/columns;
 
-        ImageItem item = (ImageItem) data.get(position);
+        // Get current FolderItem
+        FolderItem item = (FolderItem) data.get(position);
+        // Set title and count
         holder.imageTitle.setText(item.getTitle());
         holder.imageCount.setText(String.format(Locale.ENGLISH, "%d", item.getCount()));
-        holder.image.setImageBitmap(item.getImage());
+        // Set image, thumbnail to 0.1x resolution, center-cropped, cached
+        GlideApp
+                .with(context)
+                .load(item.getImage())
+                .thumbnail(0.1f)
+                .centerCrop()
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .into(holder.image);
+
         return row;
     }
 

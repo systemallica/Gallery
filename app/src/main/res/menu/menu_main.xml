@@ -4,7 +4,19 @@
     tools:context="com.example.systemallica.gallery.MainActivity">
     <item
         android:id="@+id/action_settings"
-        android:orderInCategory="100"
+        android:orderInCategory="0"
         android:title="@string/action_settings"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_increase_column"
+        android:orderInCategory="1"
+        android:title="@string/action_increase_columns"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_decrease_column"
+        android:orderInCategory="2"
+        android:title="@string/action_decrease_columns"
         app:showAsAction="never" />
 </menu>

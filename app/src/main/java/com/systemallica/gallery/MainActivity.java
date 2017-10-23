@@ -3,55 +3,57 @@ package com.systemallica.gallery;
 import android.Manifest;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.GridView;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
-import static com.systemallica.gallery.Utils.dpToPx;
 
 public class MainActivity extends AppCompatActivity {
 
     final int MY_PERMISSIONS_REQUEST_BOTH= 114;
+    int columns = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //Check for sdk >= 23
+        // Check for sdk >= 23
         if (Build.VERSION.SDK_INT >= 23) {
-            //Check CAMERA and MEDIA permission
-            if (checkSelfPermission(Manifest.permission.CAMERA)!= PERMISSION_GRANTED
-                    || checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)!=
-                    PERMISSION_GRANTED ) {
+            // Check CAMERA and MEDIA permission
+            if (checkSelfPermission(Manifest.permission.CAMERA)!= PERMISSION_GRANTED ||
+                checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)!= PERMISSION_GRANTED ||
+                checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)!= PERMISSION_GRANTED ){
                 requestPermissions(new String[]{
                                 Manifest.permission.CAMERA,
-                                Manifest.permission.READ_EXTERNAL_STORAGE},
+                                Manifest.permission.READ_EXTERNAL_STORAGE,
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE},
                         MY_PERMISSIONS_REQUEST_BOTH);
-            //Check CAMERA permission
+            // When permissions are granted
             }else{
                 setFABListener();
-                loadImages();
+                loadFolders(columns);
             }
         }
     }
@@ -70,57 +72,73 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch(id){
+            case R.id.action_settings:
+                Snackbar.make(findViewById(R.id.main), "Settings", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+                return true;
+            case R.id.action_increase_column:
+                if(columns<6) {
+                    columns++;
+                    loadFolders(columns);
+                }
+                return true;
+            case R.id.action_decrease_column:
+                if(columns>1) {
+                    columns--;
+                    loadFolders(columns);
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
+                                           @NonNull int[] grantResults) {
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_BOTH:
                 if(grantResults.length > 0 && grantResults[0] == PERMISSION_GRANTED
                         && grantResults[1] == PERMISSION_GRANTED) {
                     setFABListener();
-                    loadImages();
+                    loadFolders(columns);
                 }else if (grantResults.length > 0 && grantResults[1] == PERMISSION_GRANTED){
-                    Snackbar.make(findViewById(R.id.main), "Camera button won't work", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
-                    loadImages();
+                    Snackbar.make(findViewById(R.id.main), "Camera button won't work",
+                            Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                    loadFolders(columns);
                 }else{
-                    Snackbar.make(findViewById(R.id.main), "App can't work... closing", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
+                    Snackbar.make(findViewById(R.id.main), "App can't work... closing",
+                            Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                    System.exit(0);
                 }
         }
     }
 
-    public void loadImages(){
-
-        //TODO: open folders
-        //TODO: set grid width/height dynamically
+    public void loadFolders(int columns){
 
         GridView gridView;
-        GridViewAdapter gridAdapter;
+        GridViewAdapterFolders gridAdapter;
 
         // Define the cursor and get path and bitmap of images
         Uri uri;
-        ArrayList<ImageItem> list_of_folder_images = new ArrayList<>();
-        ArrayList<String> list_of_folders = new ArrayList<>();
+        final ArrayList<FolderItem> list_of_folders = new ArrayList<>();
+        ArrayList<String> list_of_folder_names = new ArrayList<>();
         Cursor cursor;
         int column_index_data;
         int column_index_folder_name;
         String path_of_image;
+        String path_of_video;
         String folder_name;
 
-        uri = android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+        // Images-----------------------------------------------------------------------------------
 
-        String[] projection = { MediaStore.MediaColumns.DATA,
+        uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+
+        String[] projection_i = { MediaStore.MediaColumns.DATA,
                 MediaStore.Images.Media.BUCKET_DISPLAY_NAME };
 
-        cursor = getContentResolver().query(uri, projection, null, null, null);
+        cursor = getContentResolver().query(uri, projection_i, null, null, MediaStore.MediaColumns.DATE_ADDED + " DESC");
 
         if (cursor!= null) {
             // Get path of image
@@ -128,81 +146,88 @@ public class MainActivity extends AppCompatActivity {
             // Get folder name
             column_index_folder_name = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
 
-            // Get width in dp and px
-            DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-            float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-            int pxWidth = dpToPx((int)dpWidth, this);
-
             while (cursor.moveToNext()) {
                 path_of_image = cursor.getString(column_index_data);
                 folder_name = cursor.getString(column_index_folder_name);
 
-                if (!list_of_folders.contains(folder_name)) {
-                    list_of_folders.add(folder_name);
+                if (!list_of_folder_names.contains(folder_name)) {
+                    list_of_folder_names.add(folder_name);
 
-                    Log.i("path: ", path_of_image);
+                    //Log.i("path: ", path_of_image);
                     File imgFile = new File(path_of_image);
 
                     // Get number of pictures in folder
-                    int files_in_folder = imgFile.getParentFile().listFiles().length;
-                    // Avoid OOM error by extending allocated memory
-                    BitmapFactory.Options options = new BitmapFactory.Options();
-                    options.inJustDecodeBounds = true;
-                    // Sample original image
-                    Bitmap bitmap_sampled = decodeSampledBitmapFromFile(imgFile, pxWidth, pxWidth);
-                    // Generate thumbnail
-                    Bitmap bitmap_thumbnail = ThumbnailUtils.extractThumbnail(bitmap_sampled, pxWidth, pxWidth);
-                    list_of_folder_images.add(new ImageItem(bitmap_thumbnail, folder_name, files_in_folder));
+                    int files_in_folder = imgFile.getParentFile().listFiles(new ImageFileFilter()).length;
+                    // Add to list
+                    list_of_folders.add(new FolderItem(imgFile, folder_name, files_in_folder));
                 }
             }
             // Close the cursor
             cursor.close();
         }
 
-        // Find GridView to populate
-        gridView = (GridView) findViewById(R.id.gridView);
-        gridAdapter = new GridViewAdapter(this, R.layout.grid_item_layout, list_of_folder_images);
-        gridView.setAdapter(gridAdapter);
-    }
+        // Videos-----------------------------------------------------------------------------------
+        uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
 
-    public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
-        // Raw height and width of image
-        final int height = options.outHeight;
-        final int width = options.outWidth;
-        int inSampleSize = 1;
+        String[] projection_v = { MediaStore.MediaColumns.DATA,
+                MediaStore.Video.Media.BUCKET_DISPLAY_NAME };
 
-        if (height > reqHeight || width > reqWidth) {
+        cursor = getContentResolver().query(uri, projection_v, null, null, MediaStore.MediaColumns.DATE_ADDED + " DESC");
 
-            final int halfHeight = height / 2;
-            final int halfWidth = width / 2;
+        if (cursor!= null) {
+            // Get path of video
+            column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+            // Get folder name
+            column_index_folder_name = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.BUCKET_DISPLAY_NAME);
 
-            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-            // height and width larger than the requested height and width.
-            while ((halfHeight / inSampleSize) > reqHeight
-                    && (halfWidth / inSampleSize) > reqWidth) {
-                inSampleSize *= 2;
+            while (cursor.moveToNext()) {
+                path_of_video = cursor.getString(column_index_data);
+                folder_name = cursor.getString(column_index_folder_name);
+
+                if (!list_of_folder_names.contains(folder_name)) {
+                    list_of_folder_names.add(folder_name);
+
+                    //Log.i("path: ", path_of_video);
+                    File imgFile = new File(path_of_video);
+
+                    // Get number of pictures in folder
+                    int files_in_folder = imgFile.getParentFile().listFiles(new VideoFileFilter()).length;
+                    // Add to list
+                    list_of_folders.add(new FolderItem(imgFile, folder_name, files_in_folder));
+                }
             }
+            // Close the cursor
+            cursor.close();
         }
 
-        return inSampleSize;
-    }
+        Collections.sort(list_of_folders, new SortFoldersByName());
 
-    public static Bitmap decodeSampledBitmapFromFile(File file, int reqWidth, int reqHeight) {
+        // Find GridView to populate
+        gridView = findViewById(R.id.gridView);
+        // Set number of columns
+        gridView.setNumColumns(columns);
+        // Create and set the adapter (context, layout_of_image, list_of_folders)
+        gridAdapter = new GridViewAdapterFolders(this, R.layout.grid_item_layout_folder, list_of_folders,
+                                          columns);
+        gridView.setAdapter(gridAdapter);
+        // OnClick listener
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View v,
+                                    int position, long id) {
+                // Create intent
+                Intent intent = new Intent(getBaseContext(), FolderActivity.class);
+                intent.putExtra("folder", list_of_folders.get(position).getTitle());
+                // Start activity
+                startActivity(intent);
+            }
+        });
 
-        // First decode with inJustDecodeBounds=true to check dimensions
-        final BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(file.getAbsolutePath(), options);
-        // Calculate inSampleSize
-        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
-
-        // Decode bitmap with inSampleSize set
-        options.inJustDecodeBounds = false;
-        return BitmapFactory.decodeFile(file.getAbsolutePath(), options);
+        setFABScrollListener();
     }
 
     private void setFABListener() {
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -210,5 +235,71 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    private void setFABScrollListener(){
+        final FloatingActionButton fab = findViewById(R.id.fab);
+        GridView gridView = findViewById(R.id.gridView);
+
+        gridView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            int mLastFirstVisibleItem;
+
+            // Called at end of scrolling action
+            public void onScroll (AbsListView view, int firstVisibleItem, int visibleItemCount,
+                                  int totalItemCount) {
+                // Do nothing
+            }
+
+            // Called at beginning of scrolling action
+            public void onScrollStateChanged(AbsListView view, int scrollState){
+
+                if (view.getId() == view.getId()) {
+                    final int currentFirstVisibleItem = view.getFirstVisiblePosition();
+                    if (currentFirstVisibleItem > mLastFirstVisibleItem) {
+                        // Scrolling down
+                        fab.hide();
+                    } else if (currentFirstVisibleItem < mLastFirstVisibleItem) {
+                        // Scrolling up
+                        fab.show();
+                    }
+
+                    mLastFirstVisibleItem = currentFirstVisibleItem;
+                }
+            }
+        });
+    }
+
+    // Filters
+    private class SortFoldersByName implements Comparator<FolderItem> {
+        @Override
+        public int compare(FolderItem o1, FolderItem o2) {
+            return (o1.getTitle()).compareTo(o2.getTitle());
+        }
+    }
+
+    private class ImageFileFilter implements FileFilter {
+        private final String[] okFileExtensions = new String[] { "jpg", "jpeg", "png", "gif" };
+
+        public boolean accept(File file) {
+            for (String extension : okFileExtensions) {
+                if (file.getName().toLowerCase().endsWith(extension)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    private class VideoFileFilter implements FileFilter {
+        private final String[] okFileExtensions = new String[] { "mp4" };
+
+        public boolean accept(File file) {
+            for (String extension : okFileExtensions) {
+                if (file.getName().toLowerCase().endsWith(extension)) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }
