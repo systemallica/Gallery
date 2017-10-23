@@ -42,12 +42,13 @@ public class MainActivity extends AppCompatActivity {
         // Check for sdk >= 23
         if (Build.VERSION.SDK_INT >= 23) {
             // Check CAMERA and MEDIA permission
-            if (checkSelfPermission(Manifest.permission.CAMERA)!= PERMISSION_GRANTED
-                    || checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)!=
-                    PERMISSION_GRANTED ) {
+            if (checkSelfPermission(Manifest.permission.CAMERA)!= PERMISSION_GRANTED ||
+                checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)!= PERMISSION_GRANTED ||
+                checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)!= PERMISSION_GRANTED ){
                 requestPermissions(new String[]{
                                 Manifest.permission.CAMERA,
-                                Manifest.permission.READ_EXTERNAL_STORAGE},
+                                Manifest.permission.READ_EXTERNAL_STORAGE,
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE},
                         MY_PERMISSIONS_REQUEST_BOTH);
             // When permissions are granted
             }else{

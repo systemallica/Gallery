@@ -4,10 +4,12 @@
     <string name="action_settings">Settings</string>
     <string name="action_increase_columns">Add column</string>
     <string name="action_decrease_columns">Remove column</string>
+    <string name="action_delete">Delete</string>
 
     <string name="desc_folder">Folder thumbnail</string>
     <string name="desc_image">Image thumbnail</string>
     <string name="desc_full_image">Full image</string>
 
     <string name="title_activity_folder">Folder</string>
+    <string name="title_activity_image">Image</string>
 </resources>

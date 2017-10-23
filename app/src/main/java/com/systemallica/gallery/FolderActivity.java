@@ -16,6 +16,10 @@ import java.util.ArrayList;
 
 public class FolderActivity extends AppCompatActivity {
 
+    final ArrayList<File> list_of_files = new ArrayList<>();
+    final ArrayList<String> list_of_paths = new ArrayList<>();
+    int position_array;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,8 +53,6 @@ public class FolderActivity extends AppCompatActivity {
 
         // Define the cursor and get path and bitmap of images
         Uri uri;
-        final ArrayList<File> list_of_files = new ArrayList<>();
-        final ArrayList<String> list_of_paths = new ArrayList<>();
         Cursor cursor;
         int column_index_data;
         String path_of_image;
@@ -120,15 +122,15 @@ public class FolderActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
 
+                position_array = position;
                 // Create intent
                 Intent intent = new Intent(getBaseContext(), ImageActivity.class);
-                // Pass image file, position in array, and array
-                intent.putExtra("image", list_of_files.get(position).getPath());
-                intent.putExtra("position", position);
+                // Pass arrayList of image paths
                 intent.putExtra("list_of_images", list_of_paths);
                 // Start activity
                 startActivity(intent);
             }
         });
     }
+
 }
