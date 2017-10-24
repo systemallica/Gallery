@@ -75,7 +75,7 @@ class GridViewAdapterFolders extends ArrayAdapter<FolderItem> {
                 .load(item.getImage())
                 .thumbnail(0.1f)
                 .centerCrop()
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                 .into(holder.image);
 
         return row;

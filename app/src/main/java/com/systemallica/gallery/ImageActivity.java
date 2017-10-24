@@ -23,6 +23,9 @@ import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOption
 public class ImageActivity extends AppCompatActivity {
 
     ArrayList<String> list_of_images;
+    PagerAdapter mPagerAdapter;
+    ViewPager mPager;
+    int position_array;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,9 +33,6 @@ public class ImageActivity extends AppCompatActivity {
         setContentView(R.layout.activity_image);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        PagerAdapter mPagerAdapter;
-        ViewPager mPager;
 
         Intent intent = getIntent();
         // Get all the images in the folder
@@ -83,6 +83,8 @@ public class ImageActivity extends AppCompatActivity {
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
 
+            position_array = position;
+
             ImageView imageView = new ImageView(getApplicationContext());
             File image = new File(list_of_images.get(position));
 
@@ -90,7 +92,7 @@ public class ImageActivity extends AppCompatActivity {
                     .with(getApplicationContext())
                     .load(image)
                     .transition(withCrossFade())
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                     .into(imageView);
 
             // Set title to image name
@@ -122,7 +124,7 @@ public class ImageActivity extends AppCompatActivity {
 
         switch(id){
             case R.id.delete:
-                //deleteImage(new File(list_of_images.get(position_array)));
+                deleteImage(new File(list_of_images.get(position_array)));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -131,9 +133,19 @@ public class ImageActivity extends AppCompatActivity {
 
     private void deleteImage(File image){
         if (image.exists()) {
+            // Remove file from device
             if (image.delete()) {
                 System.out.println("file Deleted :" + image.getPath());
-                finish();
+                // Remove image from arrayList
+                list_of_images.remove(position_array);
+                mPagerAdapter.notifyDataSetChanged();
+                // Set adapter position
+                System.out.println(position_array);
+                if(position_array>1){
+                    mPager.setCurrentItem(position_array-1);
+                }else{
+                    mPager.setCurrentItem(position_array+1);
+                }
             } else {
                 System.out.println("file not Deleted :" + image.getPath());
             }

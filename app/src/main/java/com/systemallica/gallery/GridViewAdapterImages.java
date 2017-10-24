@@ -66,7 +66,7 @@ class GridViewAdapterImages extends ArrayAdapter<File> {
                 .load(item)
                 .thumbnail(0.1f)
                 .centerCrop()
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                 .into(holder.image);
 
         return row;

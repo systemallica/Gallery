@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -53,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
             // When permissions are granted
             }else{
                 setFABListener();
-                loadFolders(columns);
+                new loadFolders(columns).execute();
             }
         }
     }
@@ -80,13 +81,13 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_increase_column:
                 if(columns<6) {
                     columns++;
-                    loadFolders(columns);
+                    new loadFolders(columns).execute();
                 }
                 return true;
             case R.id.action_decrease_column:
                 if(columns>1) {
                     columns--;
-                    loadFolders(columns);
+                    new loadFolders(columns).execute();
                 }
                 return true;
             default:
@@ -102,11 +103,11 @@ public class MainActivity extends AppCompatActivity {
                 if(grantResults.length > 0 && grantResults[0] == PERMISSION_GRANTED
                         && grantResults[1] == PERMISSION_GRANTED) {
                     setFABListener();
-                    loadFolders(columns);
+                    new loadFolders(columns).execute();
                 }else if (grantResults.length > 0 && grantResults[1] == PERMISSION_GRANTED){
                     Snackbar.make(findViewById(R.id.main), "Camera button won't work",
                             Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                    loadFolders(columns);
+                    new loadFolders(columns).execute();
                 }else{
                     Snackbar.make(findViewById(R.id.main), "App can't work... closing",
                             Snackbar.LENGTH_LONG).setAction("Action", null).show();
@@ -115,115 +116,134 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void loadFolders(int columns){
+    private class loadFolders extends AsyncTask<Void, Void, ArrayList<FolderItem>>{
 
         GridView gridView;
         GridViewAdapterFolders gridAdapter;
+        int columns;
 
-        // Define the cursor and get path and bitmap of images
-        Uri uri;
-        final ArrayList<FolderItem> list_of_folders = new ArrayList<>();
-        ArrayList<String> list_of_folder_names = new ArrayList<>();
-        Cursor cursor;
-        int column_index_data;
-        int column_index_folder_name;
-        String path_of_image;
-        String path_of_video;
-        String folder_name;
-
-        // Images-----------------------------------------------------------------------------------
-
-        uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-
-        String[] projection_i = { MediaStore.MediaColumns.DATA,
-                MediaStore.Images.Media.BUCKET_DISPLAY_NAME };
-
-        cursor = getContentResolver().query(uri, projection_i, null, null, MediaStore.MediaColumns.DATE_ADDED + " DESC");
-
-        if (cursor!= null) {
-            // Get path of image
-            column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-            // Get folder name
-            column_index_folder_name = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
-
-            while (cursor.moveToNext()) {
-                path_of_image = cursor.getString(column_index_data);
-                folder_name = cursor.getString(column_index_folder_name);
-
-                if (!list_of_folder_names.contains(folder_name)) {
-                    list_of_folder_names.add(folder_name);
-
-                    //Log.i("path: ", path_of_image);
-                    File imgFile = new File(path_of_image);
-
-                    // Get number of pictures in folder
-                    int files_in_folder = imgFile.getParentFile().listFiles(new ImageFileFilter()).length;
-                    // Add to list
-                    list_of_folders.add(new FolderItem(imgFile, folder_name, files_in_folder));
-                }
-            }
-            // Close the cursor
-            cursor.close();
+        loadFolders(int columns){
+            super();
+            this.columns = columns;
         }
 
-        // Videos-----------------------------------------------------------------------------------
-        uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+        protected ArrayList<FolderItem> doInBackground(Void... params) {
 
-        String[] projection_v = { MediaStore.MediaColumns.DATA,
-                MediaStore.Video.Media.BUCKET_DISPLAY_NAME };
+            // Define the cursor and get path and bitmap of images
+            Uri uri;
+            ArrayList<FolderItem> list_of_folders = new ArrayList<>();
+            ArrayList<String> list_of_folder_names = new ArrayList<>();
+            Cursor cursor;
+            int column_index_data;
+            int column_index_folder_name;
+            String path_of_image;
+            String path_of_video;
+            String folder_name;
 
-        cursor = getContentResolver().query(uri, projection_v, null, null, MediaStore.MediaColumns.DATE_ADDED + " DESC");
+            // Images-------------------------------------------------------------------------------
 
-        if (cursor!= null) {
-            // Get path of video
-            column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-            // Get folder name
-            column_index_folder_name = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.BUCKET_DISPLAY_NAME);
+            uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
 
-            while (cursor.moveToNext()) {
-                path_of_video = cursor.getString(column_index_data);
-                folder_name = cursor.getString(column_index_folder_name);
+            String[] projection_i = { MediaStore.MediaColumns.DATA,
+                    MediaStore.Images.Media.BUCKET_DISPLAY_NAME };
 
-                if (!list_of_folder_names.contains(folder_name)) {
-                    list_of_folder_names.add(folder_name);
+            cursor = getContentResolver().query(uri, projection_i, null, null,
+                    MediaStore.MediaColumns.DATE_ADDED + " DESC");
 
-                    //Log.i("path: ", path_of_video);
-                    File imgFile = new File(path_of_video);
+            if (cursor!= null) {
+                // Get path of image
+                column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+                // Get folder name
+                column_index_folder_name = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
 
-                    // Get number of pictures in folder
-                    int files_in_folder = imgFile.getParentFile().listFiles(new VideoFileFilter()).length;
-                    // Add to list
-                    list_of_folders.add(new FolderItem(imgFile, folder_name, files_in_folder));
+                while (cursor.moveToNext()) {
+                    path_of_image = cursor.getString(column_index_data);
+                    folder_name = cursor.getString(column_index_folder_name);
+
+                    if (!list_of_folder_names.contains(folder_name)) {
+                        list_of_folder_names.add(folder_name);
+
+                        //Log.i("path: ", path_of_image);
+                        File imgFile = new File(path_of_image);
+
+                        // Get number of pictures in folder
+                        int files_in_folder = imgFile.getParentFile().listFiles(new ImageFileFilter()).length;
+                        // Add to list
+                        list_of_folders.add(new FolderItem(imgFile, folder_name, files_in_folder));
+                    }
                 }
+                // Close the cursor
+                cursor.close();
             }
-            // Close the cursor
-            cursor.close();
+
+            // Videos-------------------------------------------------------------------------------
+            uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+
+            String[] projection_v = { MediaStore.MediaColumns.DATA,
+                    MediaStore.Video.Media.BUCKET_DISPLAY_NAME };
+
+            cursor = getContentResolver().query(uri, projection_v, null, null,
+                    MediaStore.MediaColumns.DATE_ADDED + " DESC");
+
+            if (cursor!= null) {
+                // Get path of video
+                column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+                // Get folder name
+                column_index_folder_name = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.BUCKET_DISPLAY_NAME);
+
+                while (cursor.moveToNext()) {
+                    path_of_video = cursor.getString(column_index_data);
+                    folder_name = cursor.getString(column_index_folder_name);
+
+                    if (!list_of_folder_names.contains(folder_name)) {
+                        list_of_folder_names.add(folder_name);
+
+                        //Log.i("path: ", path_of_video);
+                        File imgFile = new File(path_of_video);
+
+                        // Get number of pictures in folder
+                        int files_in_folder = imgFile.getParentFile().listFiles(new VideoFileFilter()).length;
+                        // Add to list
+                        list_of_folders.add(new FolderItem(imgFile, folder_name, files_in_folder));
+                    }
+                }
+                // Close the cursor
+                cursor.close();
+            }
+
+            Collections.sort(list_of_folders, new SortFoldersByName());
+
+            // Find GridView to populate
+            gridView = findViewById(R.id.gridView);
+            // Set number of columns
+            gridView.setNumColumns(columns);
+            // Create and set the adapter (context, layout_of_image, list_of_folders)
+            gridAdapter = new GridViewAdapterFolders(MainActivity.this,
+                                                        R.layout.grid_item_layout_folder,
+                                                        list_of_folders,
+                                                        columns);
+
+            gridAdapter.notifyDataSetChanged();
+            return list_of_folders;
         }
 
-        Collections.sort(list_of_folders, new SortFoldersByName());
+        protected void onPostExecute(final ArrayList<FolderItem> list_of_folders) {
+            gridView.setAdapter(gridAdapter);
+            // OnClick listener
+            gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View v,
+                                        int position, long id) {
+                    // Create intent
+                    Intent intent = new Intent(getBaseContext(), FolderActivity.class);
+                    intent.putExtra("folder", list_of_folders.get(position).getTitle());
+                    // Start activity
+                    startActivity(intent);
+                }
+            });
 
-        // Find GridView to populate
-        gridView = findViewById(R.id.gridView);
-        // Set number of columns
-        gridView.setNumColumns(columns);
-        // Create and set the adapter (context, layout_of_image, list_of_folders)
-        gridAdapter = new GridViewAdapterFolders(this, R.layout.grid_item_layout_folder, list_of_folders,
-                                          columns);
-        gridView.setAdapter(gridAdapter);
-        // OnClick listener
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View v,
-                                    int position, long id) {
-                // Create intent
-                Intent intent = new Intent(getBaseContext(), FolderActivity.class);
-                intent.putExtra("folder", list_of_folders.get(position).getTitle());
-                // Start activity
-                startActivity(intent);
-            }
-        });
-
-        setFABScrollListener();
+            setFABScrollListener();
+        }
     }
 
     private void setFABListener() {
@@ -270,14 +290,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Filters
-    private class SortFoldersByName implements Comparator<FolderItem> {
+    private static class SortFoldersByName implements Comparator<FolderItem> {
         @Override
         public int compare(FolderItem o1, FolderItem o2) {
             return (o1.getTitle()).compareTo(o2.getTitle());
         }
     }
 
-    private class ImageFileFilter implements FileFilter {
+    private static class ImageFileFilter implements FileFilter {
         private final String[] okFileExtensions = new String[] { "jpg", "jpeg", "png", "gif" };
 
         public boolean accept(File file) {
@@ -290,7 +310,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private class VideoFileFilter implements FileFilter {
+    private static class VideoFileFilter implements FileFilter {
         private final String[] okFileExtensions = new String[] { "mp4" };
 
         public boolean accept(File file) {
