@@ -2,6 +2,7 @@ package com.systemallica.gallery;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -22,7 +23,8 @@ import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOption
 
 public class ImageActivity extends AppCompatActivity {
 
-    ArrayList<String> list_of_images;
+    ArrayList<String> list_of_images = new ArrayList<>();
+    ArrayList<Integer> files_to_delete = new ArrayList<>();
     PagerAdapter mPagerAdapter;
     ViewPager mPager;
     int position_array;
@@ -53,6 +55,9 @@ public class ImageActivity extends AppCompatActivity {
             // Display arrow to return to previous activity
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+
+        // Set result to 0 -> No file deleted
+        setResult(0);
 
     }
 
@@ -134,20 +139,26 @@ public class ImageActivity extends AppCompatActivity {
     private void deleteImage(File image){
         if (image.exists()) {
             // Remove file from device
+            System.out.println("Delete from device");
             if (image.delete()) {
-                System.out.println("file Deleted :" + image.getPath());
+                // Set result of activity to 1 -> File deleted
+                files_to_delete.add(position_array);
+                Intent intent = new Intent();
+                intent.putIntegerArrayListExtra("files", files_to_delete);
+                setResult(1, intent);
+                //Remove image from MediaStore
+                System.out.println("Delete from MediaStore");
+                sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(new File(list_of_images.get(position_array)))));
                 // Remove image from arrayList
                 list_of_images.remove(position_array);
+                // Notify data changed
                 mPagerAdapter.notifyDataSetChanged();
                 // Set adapter position
-                System.out.println(position_array);
                 if(position_array>1){
                     mPager.setCurrentItem(position_array-1);
                 }else{
                     mPager.setCurrentItem(position_array+1);
                 }
-            } else {
-                System.out.println("file not Deleted :" + image.getPath());
             }
         }
     }

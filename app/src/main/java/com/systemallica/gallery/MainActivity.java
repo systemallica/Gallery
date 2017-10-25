@@ -223,12 +223,12 @@ public class MainActivity extends AppCompatActivity {
                                                         list_of_folders,
                                                         columns);
 
-            gridAdapter.notifyDataSetChanged();
             return list_of_folders;
         }
 
         protected void onPostExecute(final ArrayList<FolderItem> list_of_folders) {
             gridView.setAdapter(gridAdapter);
+            gridAdapter.notifyDataSetChanged();
             // OnClick listener
             gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override

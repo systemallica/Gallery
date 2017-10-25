@@ -15,6 +15,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import java.io.File;
 import java.util.ArrayList;
 
+import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 import static com.systemallica.gallery.Utils.dpToPx;
 
 class GridViewAdapterImages extends ArrayAdapter<File> {
@@ -66,6 +67,7 @@ class GridViewAdapterImages extends ArrayAdapter<File> {
                 .load(item)
                 .thumbnail(0.1f)
                 .centerCrop()
+                .transition(withCrossFade())
                 .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                 .into(holder.image);
 

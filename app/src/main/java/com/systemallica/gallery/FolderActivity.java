@@ -19,6 +19,9 @@ public class FolderActivity extends AppCompatActivity {
 
     final ArrayList<File> list_of_files = new ArrayList<>();
     final ArrayList<String> list_of_paths = new ArrayList<>();
+    String folder;
+    GridView gridView;
+    GridViewAdapterImages gridAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,8 +32,8 @@ public class FolderActivity extends AppCompatActivity {
 
         // Get name of folder passed with the intent
         Intent intent = getIntent();
-        String folder = intent.getStringExtra("folder");
-        new loadImages(folder).execute();
+        folder = intent.getStringExtra("folder");
+        new loadImages(folder, false).execute();
 
         if (getSupportActionBar() != null) {
             // Set title to folder name
@@ -48,15 +51,27 @@ public class FolderActivity extends AppCompatActivity {
 
     private class loadImages extends AsyncTask<Void, Void, Void> {
 
-        GridView gridView;
-        GridViewAdapterImages gridAdapter;
         String folder;
+        boolean refresh;
 
-        loadImages(String folder){
+        loadImages(String folder, boolean refresh){
             super();
             this.folder = folder;
+            this.refresh = refresh;
         }
 
+        protected void onPreExecute(){
+            if (refresh) {
+                System.out.println("Delete from memory and cache");
+                GlideApp.get(FolderActivity.this).clearMemory();
+                AsyncTask.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        GlideApp.get(FolderActivity.this).clearDiskCache();
+                    }
+                });
+            }
+        }
         protected Void doInBackground(Void... params) {
             // Define the cursor and get path and bitmap of images
             Uri uri;
@@ -126,12 +141,11 @@ public class FolderActivity extends AppCompatActivity {
             gridAdapter = new GridViewAdapterImages(FolderActivity.this,
                     R.layout.grid_item_layout_image, list_of_files, 3);
 
-            gridAdapter.notifyDataSetChanged();
-
             return null;
         }
         protected void onPostExecute(Void param) {
             gridView.setAdapter(gridAdapter);
+            gridAdapter.notifyDataSetChanged();
             // OnClick listener
             gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
@@ -139,14 +153,30 @@ public class FolderActivity extends AppCompatActivity {
                                         int position, long id) {
 
                     // Create intent
-                    Intent intent = new Intent(getBaseContext(), ImageActivity.class);
+                    Intent intent = new Intent(FolderActivity.this, ImageActivity.class);
                     // Pass arrayList of image paths
                     intent.putExtra("position", position);
                     intent.putExtra("list_of_images", list_of_paths);
                     // Start activity
-                    startActivity(intent);
+                    startActivityForResult(intent, 1);
                 }
             });
+        }
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1) {
+            // One or more images were deleted
+            if(resultCode == 1) {
+                ArrayList<Integer> position = data.getIntegerArrayListExtra("files");
+                for(int i = 0; i < position.size(); i++){
+                    System.out.println("remove: " + list_of_paths.get(position.get(i)-1));
+                    list_of_paths.remove(list_of_paths.get(position.get(i)-1));
+                    list_of_files.remove(list_of_files.get(position.get(i)-1));
+                }
+                gridAdapter.notifyDataSetChanged();
+            }
         }
     }
 }
