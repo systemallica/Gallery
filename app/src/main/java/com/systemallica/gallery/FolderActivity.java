@@ -151,7 +151,6 @@ public class FolderActivity extends AppCompatActivity {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View v,
                                         int position, long id) {
-
                     // Create intent
                     Intent intent = new Intent(FolderActivity.this, ImageActivity.class);
                     // Pass arrayList of image paths
@@ -171,7 +170,6 @@ public class FolderActivity extends AppCompatActivity {
             if(resultCode == 1) {
                 ArrayList<Integer> position = data.getIntegerArrayListExtra("files");
                 for(int i = 0; i < position.size(); i++){
-                    System.out.println("remove: " + list_of_paths.get(position.get(i)-1));
                     list_of_paths.remove(list_of_paths.get(position.get(i)-1));
                     list_of_files.remove(list_of_files.get(position.get(i)-1));
                 }

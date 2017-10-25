@@ -137,28 +137,30 @@ public class ImageActivity extends AppCompatActivity {
     }
 
     private void deleteImage(File image){
+        int move_to;
         if (image.exists()) {
             // Remove file from device
-            System.out.println("Delete from device");
             if (image.delete()) {
-                // Set result of activity to 1 -> File deleted
+                // Add deleted file position to ArrayList and send it as Extra
                 files_to_delete.add(position_array);
                 Intent intent = new Intent();
                 intent.putIntegerArrayListExtra("files", files_to_delete);
+                // Set result of activity to 1 -> File deleted
                 setResult(1, intent);
                 //Remove image from MediaStore
-                System.out.println("Delete from MediaStore");
                 sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(new File(list_of_images.get(position_array)))));
+                // Set adapter position
+                if(position_array>1){
+                    move_to = position_array - 1;
+                    mPager.setCurrentItem(move_to, true);
+                }else{
+                    move_to = position_array + 1;
+                    mPager.setCurrentItem(move_to, true);
+                }
                 // Remove image from arrayList
                 list_of_images.remove(position_array);
                 // Notify data changed
                 mPagerAdapter.notifyDataSetChanged();
-                // Set adapter position
-                if(position_array>1){
-                    mPager.setCurrentItem(position_array-1);
-                }else{
-                    mPager.setCurrentItem(position_array+1);
-                }
             }
         }
     }
