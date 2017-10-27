@@ -12,4 +12,6 @@
 
     <string name="title_activity_folder">Folder</string>
     <string name="title_activity_image">Image</string>
+
+    <string name="no_images">The folder is empty!</string>
 </resources>

@@ -74,8 +74,7 @@ public class FolderActivity extends AppCompatActivity {
 
             uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
 
-            String[] projection_i = { MediaStore.MediaColumns.DATA,
-                    MediaStore.Images.Media.BUCKET_DISPLAY_NAME };
+            String[] projection_i = { MediaStore.MediaColumns.DATA };
 
             String where = MediaStore.Images.Media.BUCKET_DISPLAY_NAME + " = ?";
 
@@ -102,8 +101,7 @@ public class FolderActivity extends AppCompatActivity {
             // Videos-------------------------------------------------------------------------------
             uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
 
-            String[] projection_v = { MediaStore.MediaColumns.DATA,
-                    MediaStore.Video.Media.BUCKET_DISPLAY_NAME };
+            String[] projection_v = { MediaStore.MediaColumns.DATA };
 
             cursor = getContentResolver().query(uri, projection_v, where, new String[]{folder},
                     MediaStore.MediaColumns.DATE_ADDED + " DESC");
@@ -158,7 +156,6 @@ public class FolderActivity extends AppCompatActivity {
         if (requestCode == 1) {
             // One or more images were deleted
             if(resultCode == 1) {
-
                 ArrayList<Integer> position = data.getIntegerArrayListExtra("files");
                 for(int i = 0; i < position.size(); i++){
                     list_of_paths.remove(list_of_paths.get(position.get(i)));
@@ -166,17 +163,27 @@ public class FolderActivity extends AppCompatActivity {
                 }
                 gridAdapter.notifyDataSetChanged();
             }
-            // The last image of the folder was deleted
+            // The only image of the folder was deleted
             if(resultCode == 2) {
-
                 ArrayList<Integer> position = data.getIntegerArrayListExtra("files");
                 for(int i = 0; i < position.size(); i++){
                     list_of_paths.remove(list_of_paths.get(position.get(i)));
                     list_of_files.remove(list_of_files.get(position.get(i)));
                 }
                 TextView text = findViewById(R.id.textNoImages);
-                text.setText("Folder is empty!");
+                text.setText(R.string.no_images);
                 gridAdapter.notifyDataSetChanged();
+                //TODO: delete folder
+            }
+            // The first image of the folder was deleted, need a new thumbnail
+            if(resultCode == 3) {
+                ArrayList<Integer> position = data.getIntegerArrayListExtra("files");
+                for(int i = 0; i < position.size(); i++){
+                    list_of_paths.remove(list_of_paths.get(position.get(i)));
+                    list_of_files.remove(list_of_files.get(position.get(i)));
+                }
+                gridAdapter.notifyDataSetChanged();
+                //TODO: refresh thumbnail
             }
         }
     }

@@ -28,10 +28,19 @@ public class ImageActivity extends AppCompatActivity {
     PagerAdapter mPagerAdapter;
     ViewPager mPager;
     int positionArray;
+    boolean isToolbarHidden;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        getWindow().getDecorView().setSystemUiVisibility( View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                                                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                                                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                                                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                                                        | View.SYSTEM_UI_FLAG_FULLSCREEN
+                                                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+
         setContentView(R.layout.activity_image);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -54,6 +63,9 @@ public class ImageActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             // Display arrow to return to previous activity
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            // Hide it by default
+            getSupportActionBar().hide();
+            isToolbarHidden = true;
         }
 
         // Set result to 0 -> No file deleted
@@ -98,10 +110,34 @@ public class ImageActivity extends AppCompatActivity {
                     .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                     .into(imageView);
 
-            // Set title to image name
-            if(getSupportActionBar()!= null) {
-                getSupportActionBar().setTitle(image.getName());
-            }
+            //TODO: set title on page change
+            // Set title to image name-> should be done on page change
+            //if(getSupportActionBar()!= null) {
+            //    getSupportActionBar().setTitle(image.getName());
+            //}
+
+            imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(getSupportActionBar() != null) {
+
+                        if(isToolbarHidden){
+                            getWindow().getDecorView().setSystemUiVisibility( View.SYSTEM_UI_FLAG_VISIBLE);
+                            getSupportActionBar().show();
+                            isToolbarHidden = false;
+                        }else{
+                            getWindow().getDecorView().setSystemUiVisibility( View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                                    | View.SYSTEM_UI_FLAG_FULLSCREEN
+                                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+                            getSupportActionBar().hide();
+                            isToolbarHidden = true;
+                        }
+                    }
+                }
+            });
 
             container.addView(imageView);
 
@@ -154,11 +190,13 @@ public class ImageActivity extends AppCompatActivity {
                     mPager.setCurrentItem(move_to, true);
                 }else{
                     if(list_of_images.size() == 1) {
-                        // Set result of activity to 1 -> Last file of folder deleted
+                        // Set result of activity to 2 -> Last file of folder deleted
                         setResult(2, intent);
                         finish();
                         return;
                     }else{
+                        // Set result of activity to 3 -> First image of folder was delete -> Need to recalculate folder thumbnail
+                        setResult(3, intent);
                         move_to = positionArray + 1;
                         mPager.setCurrentItem(move_to, true);
                     }
