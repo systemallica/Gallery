@@ -27,7 +27,7 @@ public class ImageActivity extends AppCompatActivity {
     ArrayList<Integer> files_to_delete = new ArrayList<>();
     PagerAdapter mPagerAdapter;
     ViewPager mPager;
-    int position_array;
+    int positionArray;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,8 +88,6 @@ public class ImageActivity extends AppCompatActivity {
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
 
-            position_array = position;
-
             ImageView imageView = new ImageView(getApplicationContext());
             File image = new File(list_of_images.get(position));
 
@@ -129,7 +127,8 @@ public class ImageActivity extends AppCompatActivity {
 
         switch(id){
             case R.id.delete:
-                deleteImage(new File(list_of_images.get(position_array)));
+                positionArray = mPager.getCurrentItem();
+                deleteImage(new File(list_of_images.get(positionArray)));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -142,23 +141,30 @@ public class ImageActivity extends AppCompatActivity {
             // Remove file from device
             if (image.delete()) {
                 // Add deleted file position to ArrayList and send it as Extra
-                files_to_delete.add(position_array);
+                files_to_delete.add(positionArray);
                 Intent intent = new Intent();
                 intent.putIntegerArrayListExtra("files", files_to_delete);
                 // Set result of activity to 1 -> File deleted
                 setResult(1, intent);
                 //Remove image from MediaStore
-                sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(new File(list_of_images.get(position_array)))));
+                sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(new File(list_of_images.get(positionArray)))));
                 // Set adapter position
-                if(position_array>1){
-                    move_to = position_array - 1;
+                if(positionArray != 0){
+                    move_to = positionArray - 1;
                     mPager.setCurrentItem(move_to, true);
                 }else{
-                    move_to = position_array + 1;
-                    mPager.setCurrentItem(move_to, true);
+                    if(list_of_images.size() == 1) {
+                        // Set result of activity to 1 -> Last file of folder deleted
+                        setResult(2, intent);
+                        finish();
+                        return;
+                    }else{
+                        move_to = positionArray + 1;
+                        mPager.setCurrentItem(move_to, true);
+                    }
                 }
                 // Remove image from arrayList
-                list_of_images.remove(position_array);
+                list_of_images.remove(positionArray);
                 // Notify data changed
                 mPagerAdapter.notifyDataSetChanged();
             }

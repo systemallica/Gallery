@@ -11,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ public class FolderActivity extends AppCompatActivity {
         // Get name of folder passed with the intent
         Intent intent = getIntent();
         folder = intent.getStringExtra("folder");
-        new loadImages(folder, false).execute();
+        new loadImages(folder).execute();
 
         if (getSupportActionBar() != null) {
             // Set title to folder name
@@ -52,25 +53,14 @@ public class FolderActivity extends AppCompatActivity {
     private class loadImages extends AsyncTask<Void, Void, Void> {
 
         String folder;
-        boolean refresh;
 
-        loadImages(String folder, boolean refresh){
+        loadImages(String folder){
             super();
             this.folder = folder;
-            this.refresh = refresh;
         }
 
         protected void onPreExecute(){
-            if (refresh) {
-                System.out.println("Delete from memory and cache");
-                GlideApp.get(FolderActivity.this).clearMemory();
-                AsyncTask.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        GlideApp.get(FolderActivity.this).clearDiskCache();
-                    }
-                });
-            }
+
         }
         protected Void doInBackground(Void... params) {
             // Define the cursor and get path and bitmap of images
@@ -168,11 +158,24 @@ public class FolderActivity extends AppCompatActivity {
         if (requestCode == 1) {
             // One or more images were deleted
             if(resultCode == 1) {
+
                 ArrayList<Integer> position = data.getIntegerArrayListExtra("files");
                 for(int i = 0; i < position.size(); i++){
-                    list_of_paths.remove(list_of_paths.get(position.get(i)-1));
-                    list_of_files.remove(list_of_files.get(position.get(i)-1));
+                    list_of_paths.remove(list_of_paths.get(position.get(i)));
+                    list_of_files.remove(list_of_files.get(position.get(i)));
                 }
+                gridAdapter.notifyDataSetChanged();
+            }
+            // The last image of the folder was deleted
+            if(resultCode == 2) {
+
+                ArrayList<Integer> position = data.getIntegerArrayListExtra("files");
+                for(int i = 0; i < position.size(); i++){
+                    list_of_paths.remove(list_of_paths.get(position.get(i)));
+                    list_of_files.remove(list_of_files.get(position.get(i)));
+                }
+                TextView text = findViewById(R.id.textNoImages);
+                text.setText("Folder is empty!");
                 gridAdapter.notifyDataSetChanged();
             }
         }
