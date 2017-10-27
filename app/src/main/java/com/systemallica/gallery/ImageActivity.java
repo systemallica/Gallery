@@ -122,7 +122,7 @@ public class ImageActivity extends AppCompatActivity {
                     if(getSupportActionBar() != null) {
 
                         if(isToolbarHidden){
-                            getWindow().getDecorView().setSystemUiVisibility( View.SYSTEM_UI_FLAG_VISIBLE);
+                            getWindow().getDecorView().setSystemUiVisibility( View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
                             getSupportActionBar().show();
                             isToolbarHidden = false;
                         }else{
