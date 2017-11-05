@@ -30,7 +30,7 @@
         <activity
             android:name=".ImageActivity"
             android:label="@string/title_activity_image"
-            android:theme="@style/AppTheme.ActuallyNoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

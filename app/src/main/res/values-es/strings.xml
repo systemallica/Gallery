@@ -10,4 +10,6 @@
     <string name="title_activity_folder">Carpeta</string>
     <string name="action_delete">Borrar</string>
     <string name="title_activity_image">Imagen</string>
+    <string name="no_images">La carpeta está vacía!</string>
+    <string name="action_share">Compartir</string>
 </resources>

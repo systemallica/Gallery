@@ -164,7 +164,6 @@ public class ImageActivity extends AppCompatActivity {
 
         switch(id){
             case R.id.action_share:
-                Log.e("test", " test1");
                 positionArray = mPager.getCurrentItem();
                 shareImage(new File(list_of_images.get(positionArray)));
                 return true;
@@ -180,7 +179,6 @@ public class ImageActivity extends AppCompatActivity {
     }
 
     private void shareImage(File image){
-        Log.e("test", " test2");
         final Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.setType("image/*");
         shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(image));
