@@ -14,4 +14,6 @@
     <string name="title_activity_image">Image</string>
 
     <string name="no_images">The folder is empty!</string>
+
+    <string name="action_share">Share</string>
 </resources>
