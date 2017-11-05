@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,6 +62,7 @@ class GridViewAdapterImages extends ArrayAdapter<File> {
         // Get current file
         File item = (File) data.get(position);
 
+        Log.e("image to load: ", item.getAbsolutePath());
         // Set image, thumbnail to 0.1x resolution, center-cropped, cached
         GlideApp
                 .with(context)

@@ -3,7 +3,6 @@ package com.systemallica.gallery;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
@@ -34,7 +33,7 @@ public class FolderActivity extends AppCompatActivity {
         // Get name of folder passed with the intent
         Intent intent = getIntent();
         folder = intent.getStringExtra("folder");
-        new loadImages(folder).execute();
+        loadImages(folder);
 
         if (getSupportActionBar() != null) {
             // Set title to folder name
@@ -50,19 +49,8 @@ public class FolderActivity extends AppCompatActivity {
         return true;
     }
 
-    private class loadImages extends AsyncTask<Void, Void, Void> {
+    private void loadImages(String folder){
 
-        String folder;
-
-        loadImages(String folder){
-            super();
-            this.folder = folder;
-        }
-
-        protected void onPreExecute(){
-
-        }
-        protected Void doInBackground(Void... params) {
             // Define the cursor and get path and bitmap of images
             Uri uri;
             Cursor cursor;
@@ -128,12 +116,9 @@ public class FolderActivity extends AppCompatActivity {
             // Create and set the adapter (context, layout_of_image, list_of_images)
             gridAdapter = new GridViewAdapterImages(FolderActivity.this,
                     R.layout.grid_item_layout_image, list_of_files, 3);
-
-            return null;
-        }
-        protected void onPostExecute(Void param) {
             gridView.setAdapter(gridAdapter);
             gridAdapter.notifyDataSetChanged();
+
             // OnClick listener
             gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
@@ -148,16 +133,15 @@ public class FolderActivity extends AppCompatActivity {
                     startActivityForResult(intent, 1);
                 }
             });
-        }
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1) {
-            // One or more images were deleted
-            if(resultCode == 1) {
+            if(resultCode!=0) {
+                // One or more images were deleted
                 ArrayList<Integer> position = data.getIntegerArrayListExtra("files");
-                for(int i = 0; i < position.size(); i++){
+                for (int i = 0; i < position.size(); i++) {
                     list_of_paths.remove(list_of_paths.get(position.get(i)));
                     list_of_files.remove(list_of_files.get(position.get(i)));
                 }
@@ -165,25 +149,17 @@ public class FolderActivity extends AppCompatActivity {
             }
             // The only image of the folder was deleted
             if(resultCode == 2) {
-                ArrayList<Integer> position = data.getIntegerArrayListExtra("files");
-                for(int i = 0; i < position.size(); i++){
-                    list_of_paths.remove(list_of_paths.get(position.get(i)));
-                    list_of_files.remove(list_of_files.get(position.get(i)));
-                }
                 TextView text = findViewById(R.id.textNoImages);
                 text.setText(R.string.no_images);
-                gridAdapter.notifyDataSetChanged();
-                //TODO: delete folder
+
+                // Set result of activity to 1 -> Folder emptied
+                setResult(1);
             }
+
             // The first image of the folder was deleted, need a new thumbnail
             if(resultCode == 3) {
-                ArrayList<Integer> position = data.getIntegerArrayListExtra("files");
-                for(int i = 0; i < position.size(); i++){
-                    list_of_paths.remove(list_of_paths.get(position.get(i)));
-                    list_of_files.remove(list_of_files.get(position.get(i)));
-                }
-                gridAdapter.notifyDataSetChanged();
-                //TODO: refresh thumbnail
+                // Set result of activity to 2 -> Thumbnail needs change
+                setResult(2);
             }
         }
     }
