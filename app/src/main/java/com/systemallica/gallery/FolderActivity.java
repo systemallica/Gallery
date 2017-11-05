@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
@@ -22,6 +24,7 @@ public class FolderActivity extends AppCompatActivity {
     String folder;
     GridView gridView;
     GridViewAdapterImages gridAdapter;
+    int columns = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +36,7 @@ public class FolderActivity extends AppCompatActivity {
         // Get name of folder passed with the intent
         Intent intent = getIntent();
         folder = intent.getStringExtra("folder");
-        loadImages(folder);
+        loadImages(folder, columns);
 
         if (getSupportActionBar() != null) {
             // Set title to folder name
@@ -49,7 +52,39 @@ public class FolderActivity extends AppCompatActivity {
         return true;
     }
 
-    private void loadImages(String folder){
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_folder, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        switch(id){
+            case R.id.action_increase_column:
+                if(columns<6) {
+                    columns++;
+                    loadImages(folder, columns);
+                }
+                return true;
+            case R.id.action_decrease_column:
+                if(columns>1) {
+                    columns--;
+                    loadImages(folder, columns);
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void loadImages(String folder, int columns){
 
             // Define the cursor and get path and bitmap of images
             Uri uri;
@@ -112,10 +147,12 @@ public class FolderActivity extends AppCompatActivity {
             // Find GridView to populate
             gridView = findViewById(R.id.gridViewFolder);
             // Set number of columns
-            gridView.setNumColumns(3);
+            gridView.setNumColumns(columns);
             // Create and set the adapter (context, layout_of_image, list_of_images)
             gridAdapter = new GridViewAdapterImages(FolderActivity.this,
-                    R.layout.grid_item_layout_image, list_of_files, 3);
+                    R.layout.grid_item_layout_image,
+                    list_of_files,
+                    columns);
             gridView.setAdapter(gridAdapter);
             gridAdapter.notifyDataSetChanged();
 

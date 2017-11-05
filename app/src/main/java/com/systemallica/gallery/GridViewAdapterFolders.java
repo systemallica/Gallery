@@ -68,11 +68,9 @@ class GridViewAdapterFolders extends ArrayAdapter<FolderItem> {
 
         // Get current FolderItem
         FolderItem item = (FolderItem) data.get(position);
-        Log.e("position: ", Integer.toString(position));
         // Set title and count
         holder.imageTitle.setText(item.getTitle());
         holder.imageCount.setText(String.format(Locale.ENGLISH, "%d", item.getCount()));
-        Log.e("image to load: ", item.getImage().getAbsolutePath());
         // Set image, thumbnail to 0.1x resolution, center-cropped, cached
         GlideApp
                 .with(context)

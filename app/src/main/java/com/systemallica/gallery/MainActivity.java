@@ -299,7 +299,7 @@ public class MainActivity extends AppCompatActivity {
     private static class SortFoldersByName implements Comparator<FolderItem> {
         @Override
         public int compare(FolderItem o1, FolderItem o2) {
-            return (o1.getTitle()).compareTo(o2.getTitle());
+            return (o1.getTitle()).compareToIgnoreCase(o2.getTitle());
         }
     }
 
