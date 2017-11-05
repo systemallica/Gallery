@@ -1,11 +1,13 @@
 package com.systemallica.gallery;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -185,42 +187,63 @@ public class ImageActivity extends AppCompatActivity {
         startActivity(Intent.createChooser(shareIntent, "Share image using"));
     }
 
-    private void deleteImage(File image){
-        int move_to;
-        if (image.exists()) {
-            // Remove file from device
-            if (image.delete()) {
-                // Add deleted file position to ArrayList and send it as Extra
-                Log.e("deleted image: ", image.getAbsolutePath());
-                files_to_delete.add(positionArray);
-                Intent intent = new Intent();
-                intent.putIntegerArrayListExtra("files", files_to_delete);
-                // Set result of activity to 1 -> File deleted
-                setResult(1, intent);
-                //Remove image from MediaStore
-                sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(new File(list_of_images.get(positionArray)))));
-                // Set adapter position
-                if(positionArray != 0){
-                    move_to = positionArray - 1;
-                    mPager.setCurrentItem(move_to, true);
-                }else{
-                    if(list_of_images.size() == 1) {
-                        // Set result of activity to 2 -> Last file of folder deleted
-                        setResult(2, intent);
-                        finish();
-                        return;
-                    }else{
-                        // Set result of activity to 3 -> First image of folder was delete -> Need to recalculate folder thumbnail
-                        setResult(3, intent);
-                        move_to = positionArray + 1;
-                        mPager.setCurrentItem(move_to, true);
-                    }
-                }
-                // Remove image from arrayList
-                list_of_images.remove(positionArray);
-                // Notify data changed
-                mPagerAdapter.notifyDataSetChanged();
+    private void deleteImage(final File image){
+        runOnUiThread(new Runnable() {
+            public void run() {
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(ImageActivity.this);
+                builder.setTitle(R.string.delete_title)
+                        .setMessage(R.string.delete_message)
+                        .setIcon(R.drawable.ic_warning_black_24dp)
+                        .setPositiveButton(R.string.delete_ok, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (image.exists()) {
+                                    // Remove file from device
+                                    if (image.delete()) {
+                                        int move_to;
+                                        // Add deleted file position to ArrayList and send it as Extra
+                                        files_to_delete.add(positionArray);
+                                        Intent intent = new Intent();
+                                        intent.putIntegerArrayListExtra("files", files_to_delete);
+                                        // Set result of activity to 1 -> File deleted
+                                        setResult(1, intent);
+                                        //Remove image from MediaStore
+                                        sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(new File(list_of_images.get(positionArray)))));
+                                        // Set adapter position
+                                        if(positionArray != 0){
+                                            move_to = positionArray - 1;
+                                            mPager.setCurrentItem(move_to, true);
+                                        }else{
+                                            if(list_of_images.size() == 1) {
+                                                // Set result of activity to 2 -> Last file of folder deleted
+                                                setResult(2, intent);
+                                                finish();
+                                                return;
+                                            }else{
+                                                // Set result of activity to 3 -> First image of folder was delete -> Need to recalculate folder thumbnail
+                                                setResult(3, intent);
+                                                move_to = positionArray + 1;
+                                                mPager.setCurrentItem(move_to, true);
+                                            }
+                                        }
+                                        // Remove image from arrayList
+                                        list_of_images.remove(positionArray);
+                                        // Notify data changed
+                                        mPagerAdapter.notifyDataSetChanged();
+                                    }
+                                }
+                            }
+                        })
+                        .setNegativeButton(R.string.delete_no, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Do nothing
+                            }
+                        });
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
+
             }
-        }
+        });
     }
 }

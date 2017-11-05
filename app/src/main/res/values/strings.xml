@@ -16,4 +16,9 @@
     <string name="no_images">The folder is empty!</string>
 
     <string name="action_share">Share</string>
+
+    <string name="delete_ok">Yes</string>
+    <string name="delete_no">No</string>
+    <string name="delete_title">Warning!</string>
+    <string name="delete_message">This will delete the image forever, are you sure?</string>
 </resources>
