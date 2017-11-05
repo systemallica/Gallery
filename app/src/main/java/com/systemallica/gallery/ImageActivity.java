@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.github.chrisbanes.photoview.PhotoView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -102,7 +103,9 @@ public class ImageActivity extends AppCompatActivity {
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
 
-            ImageView imageView = new ImageView(getApplicationContext());
+            PhotoView photoView = new PhotoView(getApplicationContext());
+
+            //ImageView imageView = new ImageView(getApplicationContext());
             File image = new File(list_of_images.get(position));
 
             GlideApp
@@ -110,7 +113,7 @@ public class ImageActivity extends AppCompatActivity {
                     .load(image)
                     .transition(withCrossFade())
                     .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                    .into(imageView);
+                    .into(photoView);
 
             //TODO: set title on page change
             // Set title to image name-> should be done on page change
@@ -118,7 +121,7 @@ public class ImageActivity extends AppCompatActivity {
             //    getSupportActionBar().setTitle(image.getName());
             //}
 
-            imageView.setOnClickListener(new View.OnClickListener() {
+            photoView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if(getSupportActionBar() != null) {
@@ -141,9 +144,9 @@ public class ImageActivity extends AppCompatActivity {
                 }
             });
 
-            container.addView(imageView);
+            container.addView(photoView);
 
-            return imageView;
+            return photoView;
         }
 
         @Override
