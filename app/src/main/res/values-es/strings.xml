@@ -12,4 +12,9 @@
     <string name="title_activity_image">Imagen</string>
     <string name="no_images">La carpeta está vacía!</string>
     <string name="action_share">Compartir</string>
+    <string name="action_details">Detalles</string>
+    <string name="delete_ok">Sí</string>
+    <string name="delete_no">No</string>
+    <string name="delete_title">Atención!</string>
+    <string name="delete_message">La imagen será borrada para siempre, quieres continuar?</string>
 </resources>

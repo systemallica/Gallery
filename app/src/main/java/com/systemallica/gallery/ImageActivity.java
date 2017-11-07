@@ -176,9 +176,13 @@ public class ImageActivity extends AppCompatActivity {
                 shareImage(new File(list_of_images.get(positionArray)));
                 return true;
 
-            case R.id.delete:
+            case R.id.action_delete:
                 positionArray = mPager.getCurrentItem();
                 deleteImage(new File(list_of_images.get(positionArray)));
+                return true;
+
+            case R.id.action_details:
+                //TODO
                 return true;
 
             default:
