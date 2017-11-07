@@ -10,6 +10,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -105,7 +106,19 @@ public class ImageActivity extends AppCompatActivity {
 
             File image = new File(list_of_images.get(position));
 
-            PhotoView photoView = new PhotoView(getApplicationContext());
+            // Inflate layout
+            LayoutInflater inflater = getLayoutInflater();
+            View layout = inflater.inflate(R.layout.view_pager_item, container, false);
+            // Get view
+            PhotoView photoView = layout.findViewById(R.id.inside_imageview);
+            ImageView overlay = layout.findViewById(R.id.outside_imageview);
+
+            // If it's a video, add overlay
+            if(Utils.isVideo(image.getName())){
+                overlay.setVisibility(View.VISIBLE);
+            }else{
+                overlay.setVisibility(View.INVISIBLE);
+            }
 
             GlideApp
                     .with(getApplicationContext())
@@ -137,9 +150,9 @@ public class ImageActivity extends AppCompatActivity {
                 }
             });
 
-            container.addView(photoView);
+            container.addView(layout);
 
-            return photoView;
+            return layout;
 
             //TODO: set title on page change
             // Set title to image name-> should be done on page change
@@ -151,7 +164,7 @@ public class ImageActivity extends AppCompatActivity {
 
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
-            container.removeView((ImageView) object);
+            container.removeView((View) object);
         }
     }
 

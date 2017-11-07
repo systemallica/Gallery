@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
         list_of_folder_names_i.clear();
         list_of_folder_names_v.clear();
 
-        // Images-------------------------------------------------------------------------------
+        // Images-----------------------------------------------------------------------------------
 
         uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
 
@@ -176,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
             cursor.close();
         }
 
-        // Videos-------------------------------------------------------------------------------
+        // Videos-----------------------------------------------------------------------------------
         uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
 
         String[] projection_v = { MediaStore.MediaColumns.DATA,
