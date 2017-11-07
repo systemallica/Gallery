@@ -21,10 +21,8 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
@@ -158,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
                     File imgFile = new File(path_of_image);
 
                     // Get number of pictures in folder
-                    int files_in_folder = imgFile.getParentFile().listFiles(new ImageFileFilter()).length;
+                    int files_in_folder = imgFile.getParentFile().listFiles(new Utils.ImageFileFilter()).length;
                     // Add to list
                     list_of_folders.add(new FolderItem(imgFile, folder_name, files_in_folder));
                 }
@@ -193,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
                     File imgFile = new File(path_of_video);
 
                     // Get number of pictures in folder
-                    int files_in_folder = imgFile.getParentFile().listFiles(new VideoFileFilter()).length;
+                    int files_in_folder = imgFile.getParentFile().listFiles(new Utils.VideoFileFilter()).length;
                     // Add to list
                     list_of_folders.add(new FolderItem(imgFile, folder_name, files_in_folder));
                 }
@@ -202,9 +200,7 @@ public class MainActivity extends AppCompatActivity {
             cursor.close();
         }
 
-        Collections.sort(list_of_folders, new SortFoldersByName());
-
-        Log.e("sizeof folders: ", Integer.toString(list_of_folders.size()));
+        Collections.sort(list_of_folders, new Utils.SortFoldersByName());
 
         // Find GridView to populate
         gridView = findViewById(R.id.gridView);
@@ -295,37 +291,5 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    // Filters
-    private static class SortFoldersByName implements Comparator<FolderItem> {
-        @Override
-        public int compare(FolderItem o1, FolderItem o2) {
-            return (o1.getTitle()).compareToIgnoreCase(o2.getTitle());
-        }
-    }
 
-    private static class ImageFileFilter implements FileFilter {
-        private final String[] okFileExtensions = new String[] { "jpg", "jpeg", "png", "gif" };
-
-        public boolean accept(File file) {
-            for (String extension : okFileExtensions) {
-                if (file.getName().toLowerCase().endsWith(extension)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-    }
-
-    private static class VideoFileFilter implements FileFilter {
-        private final String[] okFileExtensions = new String[] { "mp4" };
-
-        public boolean accept(File file) {
-            for (String extension : okFileExtensions) {
-                if (file.getName().toLowerCase().endsWith(extension)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-    }
 }

@@ -186,7 +186,7 @@ public class FolderActivity extends AppCompatActivity {
             }
             // The only image of the folder was deleted
             if(resultCode == 2) {
-                TextView text = findViewById(R.id.textNoImages);
+                TextView text = findViewById(R.id.placeholderNoImages);
                 text.setText(R.string.no_images);
 
                 // Set result of activity to 1 -> Folder emptied

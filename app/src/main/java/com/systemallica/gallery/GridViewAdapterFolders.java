@@ -46,7 +46,8 @@ class GridViewAdapterFolders extends ArrayAdapter<FolderItem> {
             holder = new ViewHolder();
             holder.imageTitle = row.findViewById(R.id.folder_name);
             holder.imageCount = row.findViewById(R.id.n_images);
-            holder.image = row.findViewById(R.id.image);
+            holder.image = row.findViewById(R.id.inside_imageview);
+            holder.overlay = row.findViewById(R.id.outside_imageview);
             row.setTag(holder);
         } else {
             holder = (ViewHolder) row.getTag();
@@ -60,9 +61,11 @@ class GridViewAdapterFolders extends ArrayAdapter<FolderItem> {
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
         int pxWidth = dpToPx((int)dpWidth, getContext());
 
-        // Change image size
+        // Change image and overlay size
         holder.image.getLayoutParams().height = pxWidth/columns;
         holder.image.getLayoutParams().width = pxWidth/columns;
+        holder.overlay.getLayoutParams().height = pxWidth/10;
+        holder.overlay.getLayoutParams().width = pxWidth/10;
         // Change text container size
         lv.getLayoutParams().width = pxWidth/columns;
 
@@ -71,6 +74,13 @@ class GridViewAdapterFolders extends ArrayAdapter<FolderItem> {
         // Set title and count
         holder.imageTitle.setText(item.getTitle());
         holder.imageCount.setText(String.format(Locale.ENGLISH, "%d", item.getCount()));
+
+        // If it's a video, add overlay
+        if(item.getImage().getName().endsWith(".mp4") || item.getImage().getName().endsWith(".3gp")){
+            holder.overlay.setVisibility(View.VISIBLE);
+        }else{
+            holder.overlay.setVisibility(View.INVISIBLE);
+        }
         // Set image, thumbnail to 0.1x resolution, center-cropped, cached
         GlideApp
                 .with(context)
@@ -86,6 +96,7 @@ class GridViewAdapterFolders extends ArrayAdapter<FolderItem> {
 
     private static class ViewHolder {
         ImageView image;
+        ImageView overlay;
         TextView imageTitle;
         TextView imageCount;
     }

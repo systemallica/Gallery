@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,7 +42,8 @@ class GridViewAdapterImages extends ArrayAdapter<File> {
             LayoutInflater inflater = ((Activity) context).getLayoutInflater();
             row = inflater.inflate(layoutResourceId, parent, false);
             holder = new ViewHolder();
-            holder.image = row.findViewById(R.id.image);
+            holder.image = row.findViewById(R.id.inside_imageview);
+            holder.overlay = row.findViewById(R.id.outside_imageview);
             row.setTag(holder);
         } else {
             holder = (ViewHolder) row.getTag();
@@ -55,12 +55,21 @@ class GridViewAdapterImages extends ArrayAdapter<File> {
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
         int pxWidth = dpToPx((int)dpWidth, getContext());
 
-        // Change image size
+        // Change image and overlay size
         holder.image.getLayoutParams().height = pxWidth/columns;
         holder.image.getLayoutParams().width = pxWidth/columns;
+        holder.overlay.getLayoutParams().height = pxWidth/10;
+        holder.overlay.getLayoutParams().width = pxWidth/10;
 
         // Get current file
         File item = (File) data.get(position);
+
+        // If it's a video, add overlay
+        if(item.getName().endsWith(".mp4") || item.getName().endsWith(".3gp")){
+            holder.overlay.setVisibility(View.VISIBLE);
+        }else{
+            holder.overlay.setVisibility(View.INVISIBLE);
+        }
 
         // Set image, thumbnail to 0.1x resolution, center-cropped, cached
         GlideApp
@@ -77,5 +86,6 @@ class GridViewAdapterImages extends ArrayAdapter<File> {
 
     private static class ViewHolder {
         ImageView image;
+        ImageView overlay;
     }
 }

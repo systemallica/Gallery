@@ -20,7 +20,7 @@
         android:clickable="true"/>
 
     <TextView
-        android:id="@+id/textNoImages"
+        android:id="@+id/placeholderNoImages"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerHorizontal="true"
