@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
-import static com.systemallica.gallery.Utils.dpToPx;
 
 class GridViewAdapterFolders extends ArrayAdapter<FolderItem> {
     private Context context;
@@ -59,13 +57,13 @@ class GridViewAdapterFolders extends ArrayAdapter<FolderItem> {
         DisplayMetrics displayMetrics = getContext().getResources().getDisplayMetrics();
         //float dpHeight = displayMetrics.heightPixels / displayMetrics.density;
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        int pxWidth = dpToPx((int)dpWidth, getContext());
+        int pxWidth = Utils.dpToPx((int)dpWidth, getContext());
 
         // Change image and overlay size
         holder.image.getLayoutParams().height = pxWidth/columns;
         holder.image.getLayoutParams().width = pxWidth/columns;
-        holder.overlay.getLayoutParams().height = pxWidth/10;
-        holder.overlay.getLayoutParams().width = pxWidth/10;
+        holder.overlay.getLayoutParams().height = pxWidth/(columns+5);
+        holder.overlay.getLayoutParams().width = pxWidth/(columns+5);
         // Change text container size
         lv.getLayoutParams().width = pxWidth/columns;
 
@@ -76,7 +74,7 @@ class GridViewAdapterFolders extends ArrayAdapter<FolderItem> {
         holder.imageCount.setText(String.format(Locale.ENGLISH, "%d", item.getCount()));
 
         // If it's a video, add overlay
-        if(item.getImage().getName().endsWith(".mp4") || item.getImage().getName().endsWith(".3gp")){
+        if(Utils.isVideo(item.getImage().getName())){
             holder.overlay.setVisibility(View.VISIBLE);
         }else{
             holder.overlay.setVisibility(View.INVISIBLE);

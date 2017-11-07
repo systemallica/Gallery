@@ -58,14 +58,14 @@ class GridViewAdapterImages extends ArrayAdapter<File> {
         // Change image and overlay size
         holder.image.getLayoutParams().height = pxWidth/columns;
         holder.image.getLayoutParams().width = pxWidth/columns;
-        holder.overlay.getLayoutParams().height = pxWidth/10;
-        holder.overlay.getLayoutParams().width = pxWidth/10;
+        holder.overlay.getLayoutParams().height = pxWidth/(columns+5);
+        holder.overlay.getLayoutParams().width = pxWidth/(columns+5);
 
         // Get current file
         File item = (File) data.get(position);
 
         // If it's a video, add overlay
-        if(item.getName().endsWith(".mp4") || item.getName().endsWith(".3gp")){
+        if(Utils.isVideo(item.getName())){
             holder.overlay.setVisibility(View.VISIBLE);
         }else{
             holder.overlay.setVisibility(View.INVISIBLE);

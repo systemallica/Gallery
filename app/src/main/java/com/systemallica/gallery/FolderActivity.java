@@ -136,6 +136,7 @@ public class FolderActivity extends AppCompatActivity {
                 while (cursor.moveToNext()) {
                     // Get file
                     path_of_video = cursor.getString(column_index_data);
+                    list_of_paths.add(path_of_video);
                     File imgFile = new File(path_of_video);
                     // Add to list
                     list_of_files.add(imgFile);

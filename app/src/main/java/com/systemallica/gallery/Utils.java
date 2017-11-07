@@ -44,4 +44,7 @@ class Utils {
             return false;
         }
     }
+    static boolean isVideo(String file){
+        return(file.endsWith(".mp4") || file.endsWith(".3gp"));
+    }
 }
