@@ -31,7 +31,11 @@ public class MainActivity extends AppCompatActivity {
     int columns = 2;
     int folder_position;
     ArrayList<FolderItem> list_of_folders = new ArrayList<>();
+    ArrayList<FolderItem> list_of_folders_i = new ArrayList<>();
+    ArrayList<FolderItem> list_of_folders_v = new ArrayList<>();
     ArrayList<String> list_of_folder_names = new ArrayList<>();
+    ArrayList<String> list_of_folder_names_i = new ArrayList<>();
+    ArrayList<String> list_of_folder_names_v = new ArrayList<>();
     GridView gridView;
     GridViewAdapterFolders gridAdapter;
 
@@ -149,15 +153,15 @@ public class MainActivity extends AppCompatActivity {
                 path_of_image = cursor.getString(column_index_data);
                 folder_name = cursor.getString(column_index_folder_name);
 
-                if (!list_of_folder_names.contains(folder_name)) {
-                    list_of_folder_names.add(folder_name);
+                if (!list_of_folder_names_i.contains(folder_name)) {
+                    list_of_folder_names_i.add(folder_name);
 
                     File imgFile = new File(path_of_image);
 
                     // Get number of pictures in folder
                     int files_in_folder = imgFile.getParentFile().listFiles(new Utils.MediaFileFilter()).length;
                     // Add to list
-                    list_of_folders.add(new FolderItem(imgFile, folder_name, files_in_folder));
+                    list_of_folders_i.add(new FolderItem(imgFile, folder_name, files_in_folder));
                 }
             }
             // Close the cursor
@@ -183,19 +187,61 @@ public class MainActivity extends AppCompatActivity {
                 path_of_video = cursor.getString(column_index_data);
                 folder_name = cursor.getString(column_index_folder_name);
 
-                if (!list_of_folder_names.contains(folder_name)) {
-                    list_of_folder_names.add(folder_name);
+                if (!list_of_folder_names_v.contains(folder_name)) {
+                    list_of_folder_names_v.add(folder_name);
 
                     File imgFile = new File(path_of_video);
 
                     // Get number of pictures in folder
                     int files_in_folder = imgFile.getParentFile().listFiles(new Utils.MediaFileFilter()).length;
                     // Add to list
-                    list_of_folders.add(new FolderItem(imgFile, folder_name, files_in_folder));
+                    list_of_folders_v.add(new FolderItem(imgFile, folder_name, files_in_folder));
                 }
             }
             // Close the cursor
             cursor.close();
+        }
+
+        // Compare the results of both queries and join them together in a single sorted list
+        boolean match;
+
+        // For every folder with videos
+        for(int j=0; j<list_of_folders_v.size(); j++){
+            match = false;
+            // For every folder with images
+            for(int i=0; i< list_of_folders_i.size(); i++){
+                // If the folder contains both videos and images
+                if(list_of_folders_v.get(j).getTitle().equals(list_of_folders_i.get(i).getTitle())){
+                    match = true;
+                    // If the video is more recent than the image
+                    if(list_of_folders_v.get(j).getImage().lastModified() > list_of_folders_i.get(i).getImage().lastModified()){
+                        // Add video to list
+                        list_of_folders.add(list_of_folders_v.get(j));
+                        list_of_folder_names.add(list_of_folders_v.get(j).getTitle());
+                        break;
+                    }else{
+                        // Add image to list
+                        list_of_folders.add(list_of_folders_i.get(i));
+                        list_of_folder_names.add(list_of_folders_i.get(i).getTitle());
+                        break;
+                    }
+                }
+            }
+            // If the folder only contains videos
+            if(!match){
+                // Add video to list
+                list_of_folders.add(list_of_folders_v.get(j));
+                list_of_folder_names.add(list_of_folders_v.get(j).getTitle());
+            }
+        }
+        // For every folder with images
+        for(int z=0; z<list_of_folders_i.size(); z++){
+            // If the folder only contains images
+            if(!list_of_folder_names.contains(list_of_folders_i.get(z).getTitle())){
+                // Add image to list
+                list_of_folders.add(list_of_folders_i.get(z));
+                list_of_folder_names.add(list_of_folders_i.get(z).getTitle());
+            }
         }
 
         Collections.sort(list_of_folders, new Utils.SortFoldersByName());
