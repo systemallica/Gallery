@@ -155,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
                     File imgFile = new File(path_of_image);
 
                     // Get number of pictures in folder
-                    int files_in_folder = imgFile.getParentFile().listFiles(new Utils.ImageFileFilter()).length;
+                    int files_in_folder = imgFile.getParentFile().listFiles(new Utils.MediaFileFilter()).length;
                     // Add to list
                     list_of_folders.add(new FolderItem(imgFile, folder_name, files_in_folder));
                 }
@@ -186,11 +186,10 @@ public class MainActivity extends AppCompatActivity {
                 if (!list_of_folder_names.contains(folder_name)) {
                     list_of_folder_names.add(folder_name);
 
-                    //Log.i("path: ", path_of_video);
                     File imgFile = new File(path_of_video);
 
                     // Get number of pictures in folder
-                    int files_in_folder = imgFile.getParentFile().listFiles(new Utils.VideoFileFilter()).length;
+                    int files_in_folder = imgFile.getParentFile().listFiles(new Utils.MediaFileFilter()).length;
                     // Add to list
                     list_of_folders.add(new FolderItem(imgFile, folder_name, files_in_folder));
                 }

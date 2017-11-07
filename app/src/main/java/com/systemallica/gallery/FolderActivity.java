@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class FolderActivity extends AppCompatActivity {
 
@@ -111,11 +112,9 @@ public class FolderActivity extends AppCompatActivity {
                 while (cursor.moveToNext()) {
                     // Get file
                     path_of_image = cursor.getString(column_index_data);
-                    list_of_paths.add(path_of_image);
                     File imgFile = new File(path_of_image);
                     // Add to list
                     list_of_files.add(imgFile);
-
                 }
                 // Close the cursor
                 cursor.close();
@@ -136,7 +135,6 @@ public class FolderActivity extends AppCompatActivity {
                 while (cursor.moveToNext()) {
                     // Get file
                     path_of_video = cursor.getString(column_index_data);
-                    list_of_paths.add(path_of_video);
                     File imgFile = new File(path_of_video);
                     // Add to list
                     list_of_files.add(imgFile);
@@ -145,6 +143,12 @@ public class FolderActivity extends AppCompatActivity {
                 cursor.close();
             }
 
+            //Collections.sort(list_of_paths, new Utils.SortFilesByDate());
+            Collections.sort(list_of_files, new Utils.SortFilesByDate());
+            // Create list of files' paths
+            for (File file : list_of_files) {
+                list_of_paths.add(file.getPath());
+            }
             // Find GridView to populate
             gridView = findViewById(R.id.gridViewFolder);
             // Set number of columns

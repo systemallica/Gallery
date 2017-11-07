@@ -19,6 +19,13 @@ class Utils {
         }
     }
 
+    static class SortFilesByDate implements Comparator<File> {
+        @Override
+        public int compare(File o1, File o2) {
+            return Long.valueOf(o2.lastModified()).compareTo(o1.lastModified());
+        }
+    }
+
     static class ImageFileFilter implements FileFilter {
         private final String[] okFileExtensions = new String[] { "jpg", "jpeg", "png", "gif" };
 
@@ -33,7 +40,20 @@ class Utils {
     }
 
     static class VideoFileFilter implements FileFilter {
-        private final String[] okFileExtensions = new String[] { "mp4" };
+        private final String[] okFileExtensions = new String[] { "mp4", "3gp" };
+
+        public boolean accept(File file) {
+            for (String extension : okFileExtensions) {
+                if (file.getName().toLowerCase().endsWith(extension)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    static class MediaFileFilter implements FileFilter {
+        private final String[] okFileExtensions = new String[] { "jpg", "jpeg", "png", "gif", "mp4", "3gp" };
 
         public boolean accept(File file) {
             for (String extension : okFileExtensions) {

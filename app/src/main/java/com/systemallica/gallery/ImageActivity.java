@@ -10,7 +10,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -52,10 +51,8 @@ public class ImageActivity extends AppCompatActivity {
         Intent intent = getIntent();
         // Get all the images in the folder
         list_of_images = intent.getStringArrayListExtra("list_of_images");
-        Log.e("size:", Integer.toString(list_of_images.size()));
         // Get position
         int position_intent = intent.getIntExtra("position", 0);
-        Log.e("position:", Integer.toString(position_intent));
         // Instantiate a ViewPager and a PagerAdapter.
         mPagerAdapter = new CustomPagerAdapter(this);
         mPager = findViewById(R.id.pager);
