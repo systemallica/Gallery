@@ -11,7 +11,7 @@
 
     <ImageView
         android:id="@+id/outside_imageview"
-        android:src="@drawable/ic_play_circle_outline_white_48dp"
+        android:src="@drawable/ic_play"
         android:visibility="invisible"
         android:layout_width="1dp"
         android:layout_height="1dp"

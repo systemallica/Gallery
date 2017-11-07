@@ -105,7 +105,6 @@ public class ImageActivity extends AppCompatActivity {
 
             File image = new File(list_of_images.get(position));
 
-
             PhotoView photoView = new PhotoView(getApplicationContext());
 
             GlideApp

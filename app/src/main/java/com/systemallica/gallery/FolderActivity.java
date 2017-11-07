@@ -94,6 +94,10 @@ public class FolderActivity extends AppCompatActivity {
             String path_of_image;
             String path_of_video;
 
+            // Initialisations
+            list_of_files.clear();
+            list_of_paths.clear();
+
             // Images-------------------------------------------------------------------------------
 
             uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;

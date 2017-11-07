@@ -133,6 +133,14 @@ public class MainActivity extends AppCompatActivity {
         String path_of_video;
         String folder_name;
 
+        // Initialisations
+        list_of_folders.clear();
+        list_of_folders_i.clear();
+        list_of_folders_v.clear();
+        list_of_folder_names.clear();
+        list_of_folder_names_i.clear();
+        list_of_folder_names_v.clear();
+
         // Images-------------------------------------------------------------------------------
 
         uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
