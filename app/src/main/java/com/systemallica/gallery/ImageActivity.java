@@ -101,6 +101,11 @@ public class ImageActivity extends AppCompatActivity {
         }
 
         @Override
+        public int getItemPosition(Object object) {
+            return POSITION_NONE;
+        }
+
+        @Override
         public Object instantiateItem(ViewGroup container, int position) {
 
 
@@ -234,12 +239,12 @@ public class ImageActivity extends AppCompatActivity {
                                             mPager.setCurrentItem(move_to, true);
                                         }else{
                                             if(list_of_images.size() == 1) {
-                                                // Set result of activity to 2 -> Last file of folder deleted
+                                                // Set result of activity to 2 -> Last file of folder was deleted
                                                 setResult(2, intent);
                                                 finish();
                                                 return;
                                             }else{
-                                                // Set result of activity to 3 -> First image of folder was delete -> Need to recalculate folder thumbnail
+                                                // Set result of activity to 3 -> First image of folder was deleted -> Need to recalculate folder thumbnail
                                                 setResult(3, intent);
                                                 move_to = positionArray + 1;
                                                 mPager.setCurrentItem(move_to, true);
