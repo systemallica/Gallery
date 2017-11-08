@@ -20,6 +20,8 @@ android {
 
 repositories {
     mavenCentral()
+    jcenter()
+    google()
     maven { url 'https://maven.google.com' }
     maven { url "https://jitpack.io" }
 }
@@ -37,4 +39,5 @@ dependencies {
 
     compile 'com.github.chrisbanes:PhotoView:2.1.3'
 
+    compile 'com.google.android.exoplayer:exoplayer:r2.5.4'
 }

@@ -170,13 +170,23 @@ public class FolderActivity extends AppCompatActivity {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View v,
                                         int position, long id) {
-                    // Create intent
-                    Intent intent = new Intent(FolderActivity.this, ImageActivity.class);
-                    // Pass arrayList of image paths
-                    intent.putExtra("position", position);
-                    intent.putExtra("list_of_images", list_of_paths);
-                    // Start activity
-                    startActivityForResult(intent, 1);
+                    if(Utils.isVideo(list_of_paths.get(position))){
+                        // Create video intent
+                        Intent intent = new Intent(FolderActivity.this, VideoActivity.class);
+                        // Pass arrayList of image paths
+                        intent.putExtra("position", position);
+                        intent.putExtra("list_of_images", list_of_paths);
+                        // Start activity
+                        startActivityForResult(intent, 2);
+                    }else {
+                        // Create image intent
+                        Intent intent = new Intent(FolderActivity.this, ImageActivity.class);
+                        // Pass arrayList of image paths
+                        intent.putExtra("position", position);
+                        intent.putExtra("list_of_images", list_of_paths);
+                        // Start activity
+                        startActivityForResult(intent, 1);
+                    }
                 }
             });
     }
