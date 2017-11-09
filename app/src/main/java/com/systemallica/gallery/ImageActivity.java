@@ -20,13 +20,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.github.chrisbanes.photoview.PhotoView;
+import com.davemorrissey.labs.subscaleview.ImageSource;
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 
 import java.io.File;
 import java.util.ArrayList;
-
-import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
 public class ImageActivity extends AppCompatActivity {
 
@@ -189,9 +187,12 @@ public class ImageActivity extends AppCompatActivity {
             // Inflate layout
             LayoutInflater inflater = getLayoutInflater();
             View layout = inflater.inflate(R.layout.view_pager_item, container, false);
-            // Get view
-            PhotoView photoView = layout.findViewById(R.id.inside_imageview);
+            // Get views
+            SubsamplingScaleImageView imageView = findViewById(R.id.inside_imageview);
             ImageView overlay = layout.findViewById(R.id.outside_imageview);
+
+            //Set image
+            imageView.setImage(ImageSource.uri(Uri.fromFile(image)));
 
             // If it's a video, add overlay
             if(Utils.isVideo(image.getName())){
@@ -200,17 +201,17 @@ public class ImageActivity extends AppCompatActivity {
                 overlay.setVisibility(View.INVISIBLE);
             }
 
-            GlideApp
-                    .with(getApplicationContext())
-                    .load(image)
-                    .transition(withCrossFade())
-                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                    .into(photoView);
+            //GlideApp
+            //        .with(getApplicationContext())
+            //        .load(image)
+            //        .transition(withCrossFade())
+            //        .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+            //        .into(imageView);
 
             container.addView(layout);
 
             // Set up the user interaction to manually show or hide the system UI.
-            photoView.setOnClickListener(new View.OnClickListener() {
+            imageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     toggle();
