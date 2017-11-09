@@ -22,4 +22,12 @@
     <string name="delete_no">No</string>
     <string name="delete_title">Warning!</string>
     <string name="delete_message">This will delete the image forever, are you sure?</string>
+
+    <string name="ok">OK</string>
+    <string name="details">Image details</string>
+    <string name="details_name_title">Name</string>
+    <string name="details_path_title">Path</string>
+    <string name="details_size_title">Size</string>
+    <string name="details_type_title">Type</string>
+    <string name="details_modified_title">Modified</string>
 </resources>

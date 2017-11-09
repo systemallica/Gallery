@@ -1,15 +1,21 @@
 package com.systemallica.gallery;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.TextView;
 
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
@@ -30,6 +36,7 @@ import com.google.android.exoplayer2.util.Util;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class VideoActivity extends AppCompatActivity {
 
@@ -67,7 +74,7 @@ public class VideoActivity extends AppCompatActivity {
     };
     private SimpleExoPlayerView playerView;
     private SimpleExoPlayer player;
-    ArrayList<String> list_of_images = new ArrayList<>();
+    ArrayList<String> list_of_videos = new ArrayList<>();
     int position_intent;
 
     @Override
@@ -84,7 +91,7 @@ public class VideoActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         // Get all the images in the folder
-        list_of_images = intent.getStringArrayListExtra("list_of_images");
+        list_of_videos = intent.getStringArrayListExtra("list_of_images");
         // Get position
         position_intent = intent.getIntExtra("position", 0);
 
@@ -138,6 +145,100 @@ public class VideoActivity extends AppCompatActivity {
         delayedHide();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_video, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        File file = new File(list_of_videos.get(position_intent));
+        switch(id){
+            case R.id.action_share:
+                shareVideo(file);
+                return true;
+
+            //case R.id.action_delete:
+            //    deleteImage(file);
+            //    return true;
+
+            case R.id.action_details:
+                showDetails(file);
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void shareVideo(File video){
+        final Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("video/*");
+        shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(video));
+        startActivity(Intent.createChooser(shareIntent, "Share image using"));
+    }
+
+    void showDetails(final File image){
+        runOnUiThread(new Runnable() {
+            public void run() {
+
+                // Inflate layout and get views
+                LayoutInflater inflater = getLayoutInflater();
+                View layout = inflater.inflate(R.layout.details_dialog, null);
+                TextView nameT = layout.findViewById(R.id.name);
+                TextView pathT = layout.findViewById(R.id.path);
+                TextView sizeT = layout.findViewById(R.id.size);
+                TextView typeT = layout.findViewById(R.id.type);
+                TextView modifiedT = layout.findViewById(R.id.modified);
+
+                // Name
+                nameT.setText(image.getName());
+                // Path
+                pathT.setText(image.getPath());
+                // Size
+                Long size = image.length();
+                Double sizeD = size.doubleValue();
+                String sizeText = " bytes";
+                if(sizeD>1024){
+                    sizeD = sizeD/1024;//KB
+                    sizeText = " kilobytes";
+                    if(sizeD>1024){
+                        sizeD = sizeD/1024;//MB
+                        sizeText = " megabytes";
+                        if(sizeD>1024){
+                            sizeD = sizeD/1024;//GB
+                            sizeText = " gigabytes";
+                        }
+                    }
+                }
+                Locale current = getResources().getConfiguration().locale;
+                String result = String.format(current,"%.3f", sizeD) + sizeText;
+                sizeT.setText(result);
+                // Type
+                String type = Utils.getMimeType(image.getPath());
+                typeT.setText(type);
+                // Modified
+                modifiedT.setText(Long.toString(image.lastModified()));
+
+                // Create and show dialog
+                AlertDialog.Builder builder = new AlertDialog.Builder(VideoActivity.this);
+                builder.setView(layout)
+                        .setTitle(R.string.details)
+                        .setIcon(R.drawable.ic_information_outline_black_48dp)
+                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Close AlertDialog
+                            }
+                        });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
+    }
+
     public void exoPlayer(){
 
         // 1. Create a default TrackSelector
@@ -163,7 +264,7 @@ public class VideoActivity extends AppCompatActivity {
         ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
 
         // This is the MediaSource representing the media to be played.
-        MediaSource videoSource = new ExtractorMediaSource(Uri.fromFile(new File(list_of_images.get(position_intent))),
+        MediaSource videoSource = new ExtractorMediaSource(Uri.fromFile(new File(list_of_videos.get(position_intent))),
                 dataSourceFactory, extractorsFactory, null, null);
 
         // Prepare the player with the source.

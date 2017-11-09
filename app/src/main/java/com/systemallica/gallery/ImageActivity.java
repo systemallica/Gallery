@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.davemorrissey.labs.subscaleview.ImageSource;
@@ -26,6 +27,7 @@ import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
@@ -257,25 +259,83 @@ public class ImageActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
+        positionArray = mPager.getCurrentItem();
+        File file = new File(list_of_images.get(positionArray));
         switch(id){
             case R.id.action_share:
-                positionArray = mPager.getCurrentItem();
-                shareImage(new File(list_of_images.get(positionArray)));
+                shareImage(file);
                 return true;
 
             case R.id.action_delete:
                 positionArray = mPager.getCurrentItem();
-                deleteImage(new File(list_of_images.get(positionArray)));
+                deleteImage(file);
                 return true;
 
             case R.id.action_details:
-                //TODO
+                showDetails(file);
                 return true;
 
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    void showDetails(final File image){
+        runOnUiThread(new Runnable() {
+            public void run() {
+
+                // Inflate layout and get views
+                LayoutInflater inflater = getLayoutInflater();
+                View layout = inflater.inflate(R.layout.details_dialog, null);
+                TextView nameT = layout.findViewById(R.id.name);
+                TextView pathT = layout.findViewById(R.id.path);
+                TextView sizeT = layout.findViewById(R.id.size);
+                TextView typeT = layout.findViewById(R.id.type);
+                TextView modifiedT = layout.findViewById(R.id.modified);
+
+                // Name
+                nameT.setText(image.getName());
+                // Path
+                pathT.setText(image.getPath());
+                // Size
+                Long size = image.length();
+                Double sizeD = size.doubleValue();
+                String sizeText = " bytes";
+                if(sizeD>1024){
+                    sizeD = sizeD/1024;//KB
+                    sizeText = " kilobytes";
+                    if(sizeD>1024){
+                        sizeD = sizeD/1024;//MB
+                        sizeText = " megabytes";
+                        if(sizeD>1024){
+                            sizeD = sizeD/1024;//GB
+                            sizeText = " gigabytes";
+                        }
+                    }
+                }
+                Locale current = getResources().getConfiguration().locale;
+                String result = String.format(current,"%.3f", sizeD) + sizeText;
+                sizeT.setText(result);
+                // Type
+                String type = Utils.getMimeType(image.getPath());
+                typeT.setText(type);
+                // Modified
+                modifiedT.setText(Long.toString(image.lastModified()));
+
+                // Create and show dialog
+                AlertDialog.Builder builder = new AlertDialog.Builder(ImageActivity.this);
+                builder.setView(layout)
+                        .setTitle(R.string.details)
+                        .setIcon(R.drawable.ic_information_outline_black_48dp)
+                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Close AlertDialog
+                            }
+                        });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
     }
 
     private void shareImage(File image){

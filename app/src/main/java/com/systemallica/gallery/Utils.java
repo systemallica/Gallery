@@ -1,6 +1,7 @@
 package com.systemallica.gallery;
 
 import android.content.Context;
+import android.webkit.MimeTypeMap;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -74,5 +75,14 @@ class Utils {
 
     static boolean isGif(String file){
         return(file.endsWith(".gif"));
+    }
+
+    static String getMimeType(String url) {
+        String type = null;
+        String extension = MimeTypeMap.getFileExtensionFromUrl(url);
+        if (extension != null) {
+            type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+        }
+        return type;
     }
 }
