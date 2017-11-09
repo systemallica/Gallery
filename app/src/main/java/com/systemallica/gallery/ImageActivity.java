@@ -20,11 +20,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 
 import java.io.File;
 import java.util.ArrayList;
+
+import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
 public class ImageActivity extends AppCompatActivity {
 
@@ -187,37 +190,46 @@ public class ImageActivity extends AppCompatActivity {
             // Inflate layout
             LayoutInflater inflater = getLayoutInflater();
             View layout = inflater.inflate(R.layout.view_pager_item, container, false);
-            // Get views
-            SubsamplingScaleImageView imageView = findViewById(R.id.inside_imageview);
+            // Get overlay ImageView
             ImageView overlay = layout.findViewById(R.id.outside_imageview);
 
-            //Set image
-            imageView.setImage(ImageSource.uri(Uri.fromFile(image)));
-
-            // If it's a video, add overlay
-            if(Utils.isVideo(image.getName())){
-                overlay.setVisibility(View.VISIBLE);
+            // Video/gif thumbnail
+            if(Utils.isVideoOrGif(image.getName())){
+                ImageView imageView = layout.findViewById(R.id.inside_imageview);
+                GlideApp
+                        .with(getApplicationContext())
+                        .load(image)
+                        .transition(withCrossFade())
+                        .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                        .into(imageView);
+                if(!Utils.isGif(image.getName())) {
+                    // If it's a video, add overlay
+                    overlay.setVisibility(View.VISIBLE);
+                }
+                // Set up the user interaction to manually show or hide the system UI.
+                imageView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        toggle();
+                    }
+                });
+            // Full image display
             }else{
+                // Get subSampling view
+                SubsamplingScaleImageView imageView = layout.findViewById(R.id.inside_imageview_sub);
+                // Set image
+                imageView.setImage(ImageSource.uri(image.getPath()));
                 overlay.setVisibility(View.INVISIBLE);
+                // Set up the user interaction to manually show or hide the system UI.
+                imageView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        toggle();
+                    }
+                });
             }
 
-            //GlideApp
-            //        .with(getApplicationContext())
-            //        .load(image)
-            //        .transition(withCrossFade())
-            //        .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-            //        .into(imageView);
-
             container.addView(layout);
-
-            // Set up the user interaction to manually show or hide the system UI.
-            imageView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    toggle();
-                }
-            });
-
 
             return layout;
 

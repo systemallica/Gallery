@@ -8,7 +8,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -81,6 +80,7 @@ public class VideoActivity extends AppCompatActivity {
 
         mVisible = true;
         playerView = findViewById(R.id.video_view);
+        playerView.hideController();
 
         Intent intent = getIntent();
         // Get all the images in the folder
@@ -139,6 +139,7 @@ public class VideoActivity extends AppCompatActivity {
     }
 
     public void exoPlayer(){
+
         // 1. Create a default TrackSelector
         BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
         TrackSelection.Factory videoTrackSelectionFactory =
@@ -179,6 +180,7 @@ public class VideoActivity extends AppCompatActivity {
     }
 
     private void hide() {
+        playerView.hideController();
         // Hide UI first
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -193,6 +195,7 @@ public class VideoActivity extends AppCompatActivity {
 
     @SuppressLint("InlinedApi")
     private void show() {
+        playerView.showController();
         // Show the system bar
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);

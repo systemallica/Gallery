@@ -4,11 +4,16 @@
     android:orientation="vertical">
 
     <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+        android:id="@+id/inside_imageview_sub"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerVertical="true"/>
+
+    <ImageView
         android:id="@+id/inside_imageview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_centerVertical="true"
-        android:contentDescription="@string/desc_image"/>
+        android:contentDescription="@string/desc_full_image"/>
 
     <ImageView
         android:id="@+id/outside_imageview"

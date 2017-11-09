@@ -67,4 +67,12 @@ class Utils {
     static boolean isVideo(String file){
         return(file.endsWith(".mp4") || file.endsWith(".3gp"));
     }
+
+    static boolean isVideoOrGif(String file){
+        return(file.endsWith(".mp4") || file.endsWith(".3gp") || file.endsWith(".gif"));
+    }
+
+    static boolean isGif(String file){
+        return(file.endsWith(".gif"));
+    }
 }
