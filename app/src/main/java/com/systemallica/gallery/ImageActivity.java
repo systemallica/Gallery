@@ -27,6 +27,9 @@ import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Formatter;
+import java.util.GregorianCalendar;
 import java.util.Locale;
 
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
@@ -219,6 +222,10 @@ public class ImageActivity extends AppCompatActivity {
             }else{
                 // Get subSampling view
                 SubsamplingScaleImageView imageView = layout.findViewById(R.id.inside_imageview_sub);
+                // Use EXIF rotation
+                imageView.setOrientation(SubsamplingScaleImageView.ORIENTATION_USE_EXIF);
+                // Allow more zooming
+                imageView.setMinimumDpi(10);
                 // Set image
                 imageView.setImage(ImageSource.uri(image.getPath()));
                 overlay.setVisibility(View.INVISIBLE);
@@ -320,12 +327,20 @@ public class ImageActivity extends AppCompatActivity {
                 String type = Utils.getMimeType(image.getPath());
                 typeT.setText(type);
                 // Modified
-                modifiedT.setText(Long.toString(image.lastModified()));
+                // Convert from ms to time
+                Calendar date = new GregorianCalendar();
+                date.setTimeInMillis(image.lastModified());
+                // Format time as e.g. "Fri Feb 17 07:45:42 PST 2017"
+                StringBuilder sbu = new StringBuilder();
+                Formatter fmt = new Formatter(sbu);
+                fmt.format("%tc", date.getTime());
+
+                modifiedT.setText(sbu);
 
                 // Create and show dialog
                 AlertDialog.Builder builder = new AlertDialog.Builder(ImageActivity.this);
                 builder.setView(layout)
-                        .setTitle(R.string.details)
+                        .setTitle(R.string.details_image)
                         .setIcon(R.drawable.ic_information_outline_black_48dp)
                         .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {

@@ -36,6 +36,9 @@ import com.google.android.exoplayer2.util.Util;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Formatter;
+import java.util.GregorianCalendar;
 import java.util.Locale;
 
 public class VideoActivity extends AppCompatActivity {
@@ -221,12 +224,20 @@ public class VideoActivity extends AppCompatActivity {
                 String type = Utils.getMimeType(image.getPath());
                 typeT.setText(type);
                 // Modified
-                modifiedT.setText(Long.toString(image.lastModified()));
+                // Convert from ms to time
+                Calendar date = new GregorianCalendar();
+                date.setTimeInMillis(image.lastModified());
+                // Format time as e.g. "Fri Feb 17 07:45:42 PST 2017"
+                StringBuilder sbu = new StringBuilder();
+                Formatter fmt = new Formatter(sbu);
+                fmt.format("%tc", date.getTime());
+
+                modifiedT.setText(sbu);
 
                 // Create and show dialog
                 AlertDialog.Builder builder = new AlertDialog.Builder(VideoActivity.this);
                 builder.setView(layout)
-                        .setTitle(R.string.details)
+                        .setTitle(R.string.details_video)
                         .setIcon(R.drawable.ic_information_outline_black_48dp)
                         .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
