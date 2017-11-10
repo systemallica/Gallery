@@ -13,6 +13,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -80,7 +81,7 @@ public class ImageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_image);
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        final Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         Intent intent = getIntent();
@@ -91,17 +92,37 @@ public class ImageActivity extends AppCompatActivity {
         // Instantiate a ViewPager and a PagerAdapter.
         mPagerAdapter = new CustomPagerAdapter(this);
         mPager = findViewById(R.id.pager);
-
         // Set the adapter
         mPager.setAdapter(mPagerAdapter);
         // Set current position
         mPager.setCurrentItem(position_intent);
+        // Set onPageChangeListener
+        mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                // Set title to current image's name
+                positionArray = mPager.getCurrentItem();
+                toolbar.setTitle(new File(list_of_images.get(positionArray)).getName());
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
 
         if (getSupportActionBar() != null) {
             // Display arrow to return to previous activity
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             // Hide it by default
             getSupportActionBar().hide();
+            // Set current title
+            getSupportActionBar().setTitle(new File(list_of_images.get(position_intent)).getName());
         }
 
         // Set result to 0 -> No file deleted
@@ -162,6 +183,8 @@ public class ImageActivity extends AppCompatActivity {
         onBackPressed();
         return true;
     }
+
+
 
     class CustomPagerAdapter extends PagerAdapter {
 
@@ -241,13 +264,6 @@ public class ImageActivity extends AppCompatActivity {
             container.addView(layout);
 
             return layout;
-
-            //TODO: set title on page change
-            // Set title to image name-> should be done on page change
-            //if(getSupportActionBar()!= null) {
-            //    getSupportActionBar().setTitle(image.getName());
-            //}
-
         }
 
         @Override

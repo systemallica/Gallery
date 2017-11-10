@@ -101,6 +101,8 @@ public class VideoActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             // Display arrow to return to previous activity
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            // Set current title
+            getSupportActionBar().setTitle(new File(list_of_videos.get(position_intent)).getName());
         }
 
         exoPlayer();
