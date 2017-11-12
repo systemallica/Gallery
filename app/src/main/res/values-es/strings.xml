@@ -17,4 +17,19 @@
     <string name="delete_no">No</string>
     <string name="delete_title">Atención!</string>
     <string name="delete_message">La imagen será borrada para siempre, quieres continuar?</string>
+    <string name="action_about">Sobre la app</string>
+    <string name="title_activity_video">Video</string>
+    <string name="title_activity_about">Sobre la app</string>
+    <string name="details_image">Detalles de la imagen</string>
+    <string name="details_video">Detalles del video</string>
+    <string name="details_name_title">Nombre</string>
+    <string name="details_path_title">Ruta</string>
+    <string name="details_size_title">Tamaño</string>
+    <string name="details_type_title">Tipo</string>
+    <string name="details_modified_title">Modificado</string>
+    <string name="about_name">Galería versión:</string>
+    <string name="about_developed">Desarrollado por:</string>
+    <string name="about_library">Librerías utilizadas:</string>
+    <string name="about_contact">Contacto:</string>
+    <string name="about_rate">Tap aquí para calificar la app!</string>
 </resources>

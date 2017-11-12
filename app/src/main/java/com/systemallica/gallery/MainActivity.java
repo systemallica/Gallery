@@ -96,6 +96,11 @@ public class MainActivity extends AppCompatActivity {
                     loadFolders(columns);
                 }
                 return true;
+            case R.id.action_about:
+                // Start AboutActivity
+                Intent intent = new Intent(getBaseContext(), AboutActivity.class);
+                startActivity(intent);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

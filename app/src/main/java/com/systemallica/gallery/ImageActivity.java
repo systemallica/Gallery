@@ -184,8 +184,6 @@ public class ImageActivity extends AppCompatActivity {
         return true;
     }
 
-
-
     class CustomPagerAdapter extends PagerAdapter {
 
         Context mContext;
@@ -326,13 +324,13 @@ public class ImageActivity extends AppCompatActivity {
                 String sizeText = " bytes";
                 if(sizeD>1024){
                     sizeD = sizeD/1024;//KB
-                    sizeText = " kilobytes";
+                    sizeText = " kB";
                     if(sizeD>1024){
                         sizeD = sizeD/1024;//MB
-                        sizeText = " megabytes";
+                        sizeText = " MB";
                         if(sizeD>1024){
                             sizeD = sizeD/1024;//GB
-                            sizeText = " gigabytes";
+                            sizeText = " GB";
                         }
                     }
                 }

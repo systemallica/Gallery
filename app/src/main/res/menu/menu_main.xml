@@ -19,4 +19,10 @@
         android:orderInCategory="2"
         android:title="@string/action_decrease_columns"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_about"
+        android:orderInCategory="3"
+        android:title="@string/action_about"
+        app:showAsAction="never" />
 </menu>
