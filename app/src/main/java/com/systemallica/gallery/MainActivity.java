@@ -4,12 +4,14 @@ import android.Manifest;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -22,6 +24,9 @@ import android.widget.GridView;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
@@ -39,10 +44,13 @@ public class MainActivity extends AppCompatActivity {
     GridView gridView;
     GridViewAdapterFolders gridAdapter;
 
+    @BindView(R.id.swipelayout) SwipeRefreshLayout swipeLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -63,6 +71,14 @@ public class MainActivity extends AppCompatActivity {
                 loadFolders(columns);
             }
         }
+
+        // Set on swipe refresh listener
+        swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                startRefresh();
+            }
+        });
     }
 
     @Override
@@ -125,6 +141,44 @@ public class MainActivity extends AppCompatActivity {
                     System.exit(0);
                 }
         }
+    }
+
+    private void startRefresh(){
+
+        // Sleep main thread for better UI feedback
+        new DummySleep().execute();
+
+    }
+
+    private class DummySleep extends AsyncTask<Void, Void, Void> {
+
+        static final int TASK_DURATION = 2 * 1000; // 2 seconds
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            // Sleep for a small amount of time to simulate a background-task
+            try {
+                Thread.sleep(TASK_DURATION);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+
+            endRefresh();
+        }
+
+    }
+
+    private void endRefresh(){
+        // Refresh data
+        loadFolders(columns);
+        // Stop the refreshing indicator
+        swipeLayout.setRefreshing(false);
     }
 
     private void loadFolders(int columns){
