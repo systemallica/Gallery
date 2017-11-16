@@ -44,6 +44,7 @@ class GridViewAdapterImages extends ArrayAdapter<File> {
             holder = new ViewHolder();
             holder.image = row.findViewById(R.id.inside_imageview);
             holder.overlay = row.findViewById(R.id.outside_imageview);
+            holder.check = row.findViewById(R.id.check_imageview);
             row.setTag(holder);
         } else {
             holder = (ViewHolder) row.getTag();
@@ -60,6 +61,8 @@ class GridViewAdapterImages extends ArrayAdapter<File> {
         holder.image.getLayoutParams().width = pxWidth/columns;
         holder.overlay.getLayoutParams().height = pxWidth/(columns+5);
         holder.overlay.getLayoutParams().width = pxWidth/(columns+5);
+        holder.check.getLayoutParams().height = pxWidth/(columns+5);
+        holder.check.getLayoutParams().width = pxWidth/(columns+5);
 
         // Get current file
         File item = (File) data.get(position);
@@ -87,5 +90,6 @@ class GridViewAdapterImages extends ArrayAdapter<File> {
     private static class ViewHolder {
         ImageView image;
         ImageView overlay;
+        ImageView check;
     }
 }

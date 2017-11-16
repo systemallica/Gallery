@@ -12,6 +12,7 @@
     <string name="desc_folder">Folder thumbnail</string>
     <string name="desc_image">Image thumbnail</string>
     <string name="desc_full_image">Full image</string>
+    <string name="desc_check">Check</string>
 
     <string name="title_activity_folder">Folder</string>
     <string name="title_activity_image">Image</string>

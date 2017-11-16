@@ -10,8 +10,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.File;
@@ -167,6 +169,7 @@ public class FolderActivity extends AppCompatActivity {
 
             // OnClick listener
             gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
                 @Override
                 public void onItemClick(AdapterView<?> parent, View v,
                                         int position, long id) {
@@ -187,6 +190,27 @@ public class FolderActivity extends AppCompatActivity {
                         // Start activity
                         startActivityForResult(intent, 1);
                     }
+                }
+            });
+
+            // OnLongClick listener
+            gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+
+                @Override
+                public boolean onItemLongClick(AdapterView<?> arg0, View grid_item,
+                                               int position, long arg3) {
+                    // Get layout
+                    ViewGroup layout = (ViewGroup) grid_item;
+                    // Get "check" ImageView
+                    ImageView check = (ImageView) layout.getChildAt(2);
+                    // Toggle "check"
+                    if(check.getVisibility() == View.VISIBLE){
+                        check.setVisibility(View.GONE);
+                    }else {
+                        check.setVisibility(View.VISIBLE);
+                    }
+
+                    return true;
                 }
             });
     }
