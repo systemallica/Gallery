@@ -92,6 +92,8 @@ public class ImageActivity extends AppCompatActivity {
         // Instantiate a ViewPager and a PagerAdapter.
         mPagerAdapter = new CustomPagerAdapter(this);
         mPager = findViewById(R.id.pager);
+        // Set offScreenLimit
+        mPager.setOffscreenPageLimit(4);
         // Set the adapter
         mPager.setAdapter(mPagerAdapter);
         // Set current position
@@ -288,7 +290,6 @@ public class ImageActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_delete:
-                positionArray = mPager.getCurrentItem();
                 deleteImage(file);
                 return true;
 
@@ -375,6 +376,7 @@ public class ImageActivity extends AppCompatActivity {
     }
 
     private void deleteImage(final File image){
+
         runOnUiThread(new Runnable() {
             public void run() {
 
@@ -396,6 +398,10 @@ public class ImageActivity extends AppCompatActivity {
                                         setResult(1, intent);
                                         //Remove image from MediaStore
                                         sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(new File(list_of_images.get(positionArray)))));
+                                        // Remove image from arrayList
+                                        list_of_images.remove(positionArray);
+                                        // Notify data changed
+                                        mPagerAdapter.notifyDataSetChanged();
                                         // Set adapter position
                                         if(positionArray != 0){
                                             move_to = positionArray - 1;
@@ -405,7 +411,6 @@ public class ImageActivity extends AppCompatActivity {
                                                 // Set result of activity to 2 -> Last file of folder was deleted
                                                 setResult(2, intent);
                                                 finish();
-                                                return;
                                             }else{
                                                 // Set result of activity to 3 -> First image of folder was deleted -> Need to recalculate folder thumbnail
                                                 setResult(3, intent);
@@ -413,10 +418,7 @@ public class ImageActivity extends AppCompatActivity {
                                                 mPager.setCurrentItem(move_to, true);
                                             }
                                         }
-                                        // Remove image from arrayList
-                                        list_of_images.remove(positionArray);
-                                        // Notify data changed
-                                        mPagerAdapter.notifyDataSetChanged();
+
                                     }
                                 }
                             }
