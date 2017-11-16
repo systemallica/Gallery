@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
                 // When permissions are granted
             }else{
                 setFABListener();
+                loadFolders(columns);
             }
         }
 
@@ -140,15 +141,6 @@ public class MainActivity extends AppCompatActivity {
                     System.exit(0);
                 }
         }
-    }
-
-    @Override
-    public void onResume(){
-        super.onResume();
-
-        // Refresh grid onResume(also load grid for the first time)
-        startRefresh();
-
     }
 
     private void startRefresh(){
@@ -356,13 +348,10 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1) {
             if(resultCode == 1) {
-                System.out.println("1");
                 list_of_folders.remove(folder_position);
                 gridAdapter.notifyDataSetChanged();
             }
             if(resultCode == 2) {
-                System.out.println("2");
-                gridView.setAdapter(null);
                 startRefresh();
             }
         }

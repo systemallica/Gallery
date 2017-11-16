@@ -13,7 +13,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -407,15 +406,13 @@ public class ImageActivity extends AppCompatActivity {
                                             move_to = positionArray - 1;
                                             mPager.setCurrentItem(move_to, true);
                                         }else{
-                                            if(list_of_images.size() == 1) {
+                                            if(list_of_images.size() == 0) {
                                                 // Set result of activity to 2 -> Last file of folder was deleted
                                                 setResult(2, intent);
                                                 finish();
                                             }else{
                                                 // Set result of activity to 3 -> First image of folder was deleted -> Need to recalculate folder thumbnail
                                                 setResult(3, intent);
-                                                move_to = positionArray + 1;
-                                                mPager.setCurrentItem(move_to, true);
                                             }
                                         }
 
