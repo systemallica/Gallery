@@ -68,7 +68,6 @@ public class MainActivity extends AppCompatActivity {
                 // When permissions are granted
             }else{
                 setFABListener();
-                loadFolders(columns);
             }
         }
 
@@ -143,8 +142,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        // Refresh grid onResume(also load grid for the first time)
+        startRefresh();
+
+    }
+
     private void startRefresh(){
 
+        swipeLayout.setRefreshing(true);
         // Sleep main thread for better UI feedback
         new DummySleep().execute();
 
@@ -354,7 +363,7 @@ public class MainActivity extends AppCompatActivity {
             if(resultCode == 2) {
                 System.out.println("2");
                 gridView.setAdapter(null);
-                //loadFolders(columns);
+                startRefresh();
             }
         }
     }
