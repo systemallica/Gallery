@@ -42,9 +42,8 @@ public class ImageActivity extends AppCompatActivity {
     ViewPager mPager;
     int positionArray;
 
-    private static final int UI_ANIMATION_DELAY = 300;
     private final Handler mHideHandler = new Handler();
-    private final Runnable mHidePart2Runnable = new Runnable() {
+    private final Runnable mHideRunnable = new Runnable() {
         @SuppressLint("InlinedApi")
         @Override
         public void run() {
@@ -57,7 +56,7 @@ public class ImageActivity extends AppCompatActivity {
                             | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         }
     };
-    private final Runnable mShowPart2Runnable = new Runnable() {
+    private final Runnable mShowRunnable = new Runnable() {
         @Override
         public void run() {
             // Delayed display of UI elements
@@ -68,12 +67,6 @@ public class ImageActivity extends AppCompatActivity {
         }
     };
     private boolean mVisible;
-    private final Runnable mHideRunnable = new Runnable() {
-        @Override
-        public void run() {
-            hide();
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,10 +128,8 @@ public class ImageActivity extends AppCompatActivity {
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
 
-        // Trigger the initial hide() shortly after the activity has been
-        // created, to briefly hint to the user that UI controls
-        // are available.
-        delayedHide(UI_ANIMATION_DELAY);
+        // Trigger the initial hide()
+        hide();
     }
 
     private void toggle() {
@@ -158,8 +149,8 @@ public class ImageActivity extends AppCompatActivity {
         mVisible = false;
 
         // Schedule a runnable to remove the status and navigation bar
-        mHideHandler.removeCallbacks(mShowPart2Runnable);
-        mHideHandler.post(mHidePart2Runnable);
+        mHideHandler.removeCallbacks(mShowRunnable);
+        mHideHandler.post(mHideRunnable);
     }
 
     @SuppressLint("InlinedApi")
@@ -170,13 +161,8 @@ public class ImageActivity extends AppCompatActivity {
         mVisible = true;
 
         // Schedule a runnable to display UI elements after a delay
-        mHideHandler.removeCallbacks(mHidePart2Runnable);
-        mHideHandler.postDelayed(mShowPart2Runnable, UI_ANIMATION_DELAY);
-    }
-
-    private void delayedHide(int delayMillis) {
         mHideHandler.removeCallbacks(mHideRunnable);
-        mHideHandler.postDelayed(mHideRunnable, delayMillis);
+        mHideHandler.post(mShowRunnable);
     }
 
     @Override
@@ -229,8 +215,8 @@ public class ImageActivity extends AppCompatActivity {
                         .transition(withCrossFade())
                         .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                         .into(imageView);
-                if(!Utils.isGif(image.getName())) {
-                    // If it's a video, add overlay
+                if(Utils.isVideo(image.getName())) {
+                    // Add overlay
                     overlay.setVisibility(View.VISIBLE);
                 }
                 // Set up the user interaction to manually show or hide the system UI.
@@ -250,6 +236,7 @@ public class ImageActivity extends AppCompatActivity {
                 imageView.setMinimumDpi(10);
                 // Set image
                 imageView.setImage(ImageSource.uri(image.getPath()));
+                // Hide overlay
                 overlay.setVisibility(View.INVISIBLE);
                 // Set up the user interaction to manually show or hide the system UI.
                 imageView.setOnClickListener(new View.OnClickListener() {

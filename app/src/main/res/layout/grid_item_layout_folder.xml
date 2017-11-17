@@ -17,7 +17,7 @@
         android:layout_height="1dp"
         android:layout_alignTop="@id/inside_imageview"
         android:layout_alignStart="@id/inside_imageview"
-        android:contentDescription="@string/desc_folder"/>
+        android:contentDescription="@string/desc_overlay"/>
 
     <LinearLayout
         android:id="@+id/text_layout"
