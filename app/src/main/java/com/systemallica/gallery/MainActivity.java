@@ -8,10 +8,10 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -80,6 +80,12 @@ public class MainActivity extends AppCompatActivity {
                 startRefresh();
             }
         });
+
+        // Change navBar colour
+        if(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            int app_primary = ContextCompat.getColor(this, R.color.app_primary);
+            getWindow().setNavigationBarColor(app_primary);
+        }
     }
 
     @Override
@@ -400,6 +406,5 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
 
 }

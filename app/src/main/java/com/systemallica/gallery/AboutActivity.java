@@ -2,7 +2,9 @@ package com.systemallica.gallery;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.widget.TextView;
@@ -28,6 +30,12 @@ public class AboutActivity extends AppCompatActivity {
         //Add version number to the TextView
         String version = getResources().getString(R.string.about_name) + " " + BuildConfig.VERSION_NAME;
         app_name.setText(version);
+
+        // Change navBar colour
+        if(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            int app_primary = ContextCompat.getColor(this, R.color.app_primary);
+            getWindow().setNavigationBarColor(app_primary);
+        }
     }
 
     //Send email

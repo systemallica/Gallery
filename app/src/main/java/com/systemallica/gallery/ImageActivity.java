@@ -5,14 +5,17 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -59,7 +62,7 @@ public class ImageActivity extends AppCompatActivity {
     private final Runnable mShowRunnable = new Runnable() {
         @Override
         public void run() {
-            // Delayed display of UI elements
+            // Display of UI elements
             ActionBar actionBar = getSupportActionBar();
             if (actionBar != null) {
                 actionBar.show();
@@ -119,6 +122,12 @@ public class ImageActivity extends AppCompatActivity {
             getSupportActionBar().setTitle(new File(list_of_images.get(position_intent)).getName());
         }
 
+        // Make navBar translucent
+        if(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            int translucentBackground = ContextCompat.getColor(this, R.color.translucent_background);
+            getWindow().setNavigationBarColor(translucentBackground);
+        }
+
         // Set result to 0 -> No file deleted
         setResult(0);
 
@@ -153,7 +162,6 @@ public class ImageActivity extends AppCompatActivity {
         mHideHandler.post(mHideRunnable);
     }
 
-    @SuppressLint("InlinedApi")
     private void show() {
         // Show the system bar
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
@@ -195,10 +203,10 @@ public class ImageActivity extends AppCompatActivity {
         }
 
         @Override
-        public Object instantiateItem(ViewGroup container, int position) {
+        public Object instantiateItem(ViewGroup container, final int position) {
 
 
-            File image = new File(list_of_images.get(position));
+            final File image = new File(list_of_images.get(position));
 
             // Inflate layout
             LayoutInflater inflater = getLayoutInflater();
@@ -216,16 +224,48 @@ public class ImageActivity extends AppCompatActivity {
                         .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                         .into(imageView);
                 if(Utils.isVideo(image.getName())) {
+                    SubsamplingScaleImageView subSampling = layout.findViewById(R.id.inside_imageview_sub);
+
                     // Add overlay
                     overlay.setVisibility(View.VISIBLE);
+                    // Play video on tap
+                    overlay.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Log.e("click", "glide");
+                            // Create video intent
+                            Intent intent = new Intent(ImageActivity.this, VideoActivity.class);
+                            // Pass arrayList of image paths
+                            intent.putExtra("position", position);
+                            intent.putExtra("videoPath", image.getAbsolutePath());
+                            // Start activity
+                            startActivityForResult(intent, 2);
+                        }
+                    });
+                    // Set up the user interaction to manually show or hide the system UI.
+                    subSampling.setOnClickListener(new View.OnClickListener(){
+                        @Override
+                        public void onClick(View v){
+                            toggle();
+                        }
+                    });
+
+                    imageView.setOnClickListener(new View.OnClickListener(){
+                        @Override
+                        public void onClick(View v){
+                            toggle();
+                        }
+                    });
+
+                }else {
+                    // Set up the user interaction to manually show or hide the system UI.
+                    layout.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            toggle();
+                        }
+                    });
                 }
-                // Set up the user interaction to manually show or hide the system UI.
-                imageView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        toggle();
-                    }
-                });
             // Full image display
             }else{
                 // Get subSampling view

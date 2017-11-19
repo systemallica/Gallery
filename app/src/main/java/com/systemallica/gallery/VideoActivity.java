@@ -1,9 +1,10 @@
 package com.systemallica.gallery;
 
-import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -35,7 +36,6 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Formatter;
 import java.util.GregorianCalendar;
@@ -43,25 +43,24 @@ import java.util.Locale;
 
 public class VideoActivity extends AppCompatActivity {
 
-    private static final int UI_ANIMATION_DELAY = 300;
     private final Handler mHideHandler = new Handler();
-    private final Runnable mHidePart2Runnable = new Runnable() {
-        @SuppressLint("InlinedApi")
+    private final Runnable mHideRunnable = new Runnable() {
         @Override
         public void run() {
 
             getWindow().getDecorView().setSystemUiVisibility(
-                     View.SYSTEM_UI_FLAG_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
         }
     };
-    private final Runnable mShowPart2Runnable = new Runnable() {
+    private final Runnable mShowRunnable = new Runnable() {
         @Override
         public void run() {
-            // Delayed display of UI elements
+            // Display of UI elements
             ActionBar actionBar = getSupportActionBar();
             if (actionBar != null) {
                 actionBar.show();
@@ -69,15 +68,10 @@ public class VideoActivity extends AppCompatActivity {
         }
     };
     private boolean mVisible;
-    private final Runnable mHideRunnable = new Runnable() {
-        @Override
-        public void run() {
-            hide();
-        }
-    };
+
     private SimpleExoPlayerView playerView;
     private SimpleExoPlayer player;
-    ArrayList<String> list_of_videos = new ArrayList<>();
+    String videoPath;
     int position_intent;
 
     @Override
@@ -94,7 +88,7 @@ public class VideoActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         // Get all the images in the folder
-        list_of_videos = intent.getStringArrayListExtra("list_of_images");
+        videoPath = intent.getStringExtra("videoPath");
         // Get position
         position_intent = intent.getIntExtra("position", 0);
 
@@ -102,7 +96,13 @@ public class VideoActivity extends AppCompatActivity {
             // Display arrow to return to previous activity
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             // Set current title
-            getSupportActionBar().setTitle(new File(list_of_videos.get(position_intent)).getName());
+            getSupportActionBar().setTitle(new File(videoPath).getName());
+        }
+
+        // Make navBar translucent
+        if(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            int translucentBackground = ContextCompat.getColor(this, R.color.translucent_background);
+            getWindow().setNavigationBarColor(translucentBackground);
         }
 
         exoPlayer();
@@ -147,7 +147,7 @@ public class VideoActivity extends AppCompatActivity {
         // Trigger the initial hide() shortly after the activity has been
         // created, to briefly hint to the user that UI controls
         // are available.
-        delayedHide();
+        hide();
     }
 
     @Override
@@ -160,7 +160,7 @@ public class VideoActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        File file = new File(list_of_videos.get(position_intent));
+        File file = new File(videoPath);
         switch(id){
             case R.id.action_share:
                 shareVideo(file);
@@ -277,7 +277,7 @@ public class VideoActivity extends AppCompatActivity {
         ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
 
         // This is the MediaSource representing the media to be played.
-        MediaSource videoSource = new ExtractorMediaSource(Uri.fromFile(new File(list_of_videos.get(position_intent))),
+        MediaSource videoSource = new ExtractorMediaSource(Uri.fromFile(new File(videoPath)),
                 dataSourceFactory, extractorsFactory, null, null);
 
         // Prepare the player with the source.
@@ -303,11 +303,10 @@ public class VideoActivity extends AppCompatActivity {
         mVisible = false;
 
         // Schedule a runnable to remove the status and navigation bar
-        mHideHandler.removeCallbacks(mShowPart2Runnable);
-        mHideHandler.post(mHidePart2Runnable);
+        mHideHandler.removeCallbacks(mShowRunnable);
+        mHideHandler.post(mHideRunnable);
     }
 
-    @SuppressLint("InlinedApi")
     private void show() {
         playerView.showController();
         // Show the system bar
@@ -316,12 +315,8 @@ public class VideoActivity extends AppCompatActivity {
         mVisible = true;
 
         // Schedule a runnable to display UI elements after a delay
-        mHideHandler.removeCallbacks(mHidePart2Runnable);
-        mHideHandler.postDelayed(mShowPart2Runnable, UI_ANIMATION_DELAY);
+        mHideHandler.removeCallbacks(mHideRunnable);
+        mHideHandler.post(mShowRunnable);
     }
 
-    private void delayedHide() {
-        mHideHandler.removeCallbacks(mHideRunnable);
-        mHideHandler.postDelayed(mHideRunnable, UI_ANIMATION_DELAY);
-    }
 }

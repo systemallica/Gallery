@@ -3,8 +3,10 @@ package com.systemallica.gallery;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -46,6 +48,12 @@ public class FolderActivity extends AppCompatActivity {
             getSupportActionBar().setTitle(folder);
             // Display arrow to return to previous activity
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
+        // Change navBar colour
+        if(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            int app_primary = ContextCompat.getColor(this, R.color.app_primary);
+            getWindow().setNavigationBarColor(app_primary);
         }
     }
 
@@ -178,7 +186,7 @@ public class FolderActivity extends AppCompatActivity {
                         Intent intent = new Intent(FolderActivity.this, VideoActivity.class);
                         // Pass arrayList of image paths
                         intent.putExtra("position", position);
-                        intent.putExtra("list_of_images", list_of_paths);
+                        intent.putExtra("videoPath", list_of_paths.get(position));
                         // Start activity
                         startActivityForResult(intent, 2);
                     }else {
