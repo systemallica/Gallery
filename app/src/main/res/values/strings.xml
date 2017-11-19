@@ -8,11 +8,14 @@
     <string name="action_share">Share</string>
     <string name="action_details">Details</string>
     <string name="action_about">About</string>
+    <string name="action_rename">Rename</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_ok">OK</string>
 
     <string name="desc_folder">Folder thumbnail</string>
     <string name="desc_image">Image thumbnail</string>
     <string name="desc_full_image">Full image</string>
-    <string name="desc_check">Check</string>
+    <string name="desc_check" translatable="false">Check</string>
     <string name="desc_overlay">Video overlay</string>
 
     <string name="title_activity_folder">Folder</string>
@@ -27,7 +30,6 @@
     <string name="delete_title">Warning!</string>
     <string name="delete_message">This will delete the file forever, are you sure?</string>
 
-    <string name="ok" translatable="false">OK</string>
     <string name="details_image">Image details</string>
     <string name="details_video">Video details</string>
     <string name="details_name_title">Name</string>
@@ -35,6 +37,10 @@
     <string name="details_size_title">Size</string>
     <string name="details_type_title">Type</string>
     <string name="details_modified_title">Modified</string>
+
+    <string name="rename_rename">Rename file</string>
+    <string name="rename_old_name">Old name</string>
+    <string name="rename_new_name">New name</string>
 
     <string name="about_name">Gallery version:</string>
     <string name="about_developed">Developed by:</string>

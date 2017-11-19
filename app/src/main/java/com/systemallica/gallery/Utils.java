@@ -28,7 +28,7 @@ class Utils {
     }
 
     static class ImageFileFilter implements FileFilter {
-        private final String[] okFileExtensions = new String[] { "jpg", "jpeg", "png", "gif" };
+        private final String[] okFileExtensions = new String[]{"jpg", "jpeg", "png", "gif"};
 
         public boolean accept(File file) {
             for (String extension : okFileExtensions) {
@@ -41,7 +41,7 @@ class Utils {
     }
 
     static class VideoFileFilter implements FileFilter {
-        private final String[] okFileExtensions = new String[] { "mp4", "3gp" };
+        private final String[] okFileExtensions = new String[]{"mp4", "3gp"};
 
         public boolean accept(File file) {
             for (String extension : okFileExtensions) {
@@ -54,7 +54,7 @@ class Utils {
     }
 
     static class MediaFileFilter implements FileFilter {
-        private final String[] okFileExtensions = new String[] { "jpg", "jpeg", "png", "gif", "mp4", "3gp" };
+        private final String[] okFileExtensions = new String[]{"jpg", "jpeg", "png", "gif", "mp4", "3gp"};
 
         public boolean accept(File file) {
             for (String extension : okFileExtensions) {
@@ -65,16 +65,17 @@ class Utils {
             return false;
         }
     }
-    static boolean isVideo(String file){
-        return(file.endsWith(".mp4") || file.endsWith(".3gp"));
+
+    static boolean isVideo(String file) {
+        return (file.endsWith(".mp4") || file.endsWith(".3gp"));
     }
 
-    static boolean isVideoOrGif(String file){
-        return(file.endsWith(".mp4") || file.endsWith(".3gp") || file.endsWith(".gif"));
+    static boolean isVideoOrGif(String file) {
+        return (file.endsWith(".mp4") || file.endsWith(".3gp") || file.endsWith(".gif"));
     }
 
-    static boolean isGif(String file){
-        return(file.endsWith(".gif"));
+    static boolean isGif(String file) {
+        return (file.endsWith(".gif"));
     }
 
     static String getMimeType(String url) {
@@ -84,5 +85,25 @@ class Utils {
             type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
         }
         return type;
+    }
+
+    // Returns name of file without its extension
+    static String getBaseName(File file) {
+        String name = file.getName();
+        int pos = name.lastIndexOf(".");
+        if(pos >0){
+            name = name.substring(0, pos);
+        }
+        return name;
+    }
+
+    // Returns extension of file (including the dot)
+    static String getExtension(File file) {
+        String extension = file.getName();
+        int pos = extension.lastIndexOf(".");
+        if(pos >0){
+            extension = extension.substring(pos, extension.length());
+        }
+        return extension;
     }
 }

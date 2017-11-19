@@ -15,8 +15,14 @@
         app:showAsAction="ifRoom"/>
 
     <item
-        android:id="@+id/action_details"
+        android:id="@+id/action_rename"
         android:orderInCategory="0"
+        android:title="@string/action_rename"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_details"
+        android:orderInCategory="1"
         android:title="@string/action_details"
         app:showAsAction="never" />
 

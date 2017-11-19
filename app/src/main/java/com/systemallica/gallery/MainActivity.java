@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.swipelayout) SwipeRefreshLayout swipeLayout;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -358,7 +359,7 @@ public class MainActivity extends AppCompatActivity {
                 list_of_folders.remove(folder_position);
                 gridAdapter.notifyDataSetChanged();
             }
-            if(resultCode == 0 || resultCode == 2) {
+            if(resultCode == 2) {
                 startRefresh();
             }
         }

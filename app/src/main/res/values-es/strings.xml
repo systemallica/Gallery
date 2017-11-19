@@ -32,4 +32,11 @@
     <string name="about_library">Librerías utilizadas:</string>
     <string name="about_contact">Contacto:</string>
     <string name="about_rate">Tap aquí para calificar la app!</string>
+    <string name="action_ok">OK</string>
+    <string name="action_rename">Renombrar</string>
+    <string name="action_cancel">Cancelar</string>
+    <string name="desc_overlay">Icono de vídeo</string>
+    <string name="rename_rename">Renombrar archivo</string>
+    <string name="rename_old_name">Viejo nombre</string>
+    <string name="rename_new_name">Nuevo nombre</string>
 </resources>

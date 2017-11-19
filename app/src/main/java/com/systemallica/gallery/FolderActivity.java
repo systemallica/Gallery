@@ -3,12 +3,15 @@ package com.systemallica.gallery;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,20 +25,26 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class FolderActivity extends AppCompatActivity {
 
     final ArrayList<File> list_of_files = new ArrayList<>();
     final ArrayList<String> list_of_paths = new ArrayList<>();
     String folder;
-    GridView gridView;
     GridViewAdapterImages gridAdapter;
     int columns = 3;
+    @BindView(R.id.swipelayout) SwipeRefreshLayout swipeLayout;
+    @BindView(R.id.placeholderNoImages) TextView text;
+    @BindView(R.id.gridViewFolder) GridView gridView;
+    @BindView(R.id.toolbar) Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_folder);
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        ButterKnife.bind(this);
         setSupportActionBar(toolbar);
 
         // Get name of folder passed with the intent
@@ -55,6 +64,14 @@ public class FolderActivity extends AppCompatActivity {
             int app_primary = ContextCompat.getColor(this, R.color.app_primary);
             getWindow().setNavigationBarColor(app_primary);
         }
+
+        // Set on swipe refresh listener
+        swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                startRefresh();
+            }
+        });
     }
 
     @Override
@@ -95,6 +112,45 @@ public class FolderActivity extends AppCompatActivity {
         }
     }
 
+    private void startRefresh(){
+
+        swipeLayout.setRefreshing(true);
+        // Sleep main thread for better UI feedback
+        new DummySleep().execute();
+
+    }
+
+    private class DummySleep extends AsyncTask<Void, Void, Void> {
+
+        static final int TASK_DURATION = 2 * 1000; // 2 seconds
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            // Sleep for a small amount of time to simulate a background-task
+            try {
+                Thread.sleep(TASK_DURATION);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+
+            endRefresh();
+        }
+
+    }
+
+    private void endRefresh(){
+        // Refresh data
+        loadImages(folder, columns);
+        // Stop the refreshing indicator
+        swipeLayout.setRefreshing(false);
+    }
+
     private void loadImages(String folder, int columns){
 
             // Define the cursor and get path and bitmap of images
@@ -107,6 +163,8 @@ public class FolderActivity extends AppCompatActivity {
             // Initialisations
             list_of_files.clear();
             list_of_paths.clear();
+
+            Log.e("test", "load");
 
             // Images-------------------------------------------------------------------------------
 
@@ -163,8 +221,7 @@ public class FolderActivity extends AppCompatActivity {
             for (File file : list_of_files) {
                 list_of_paths.add(file.getPath());
             }
-            // Find GridView to populate
-            gridView = findViewById(R.id.gridViewFolder);
+
             // Set number of columns
             gridView.setNumColumns(columns);
             // Create and set the adapter (context, layout_of_image, list_of_images)
@@ -232,31 +289,48 @@ public class FolderActivity extends AppCompatActivity {
                 list_of_paths.remove(list_of_paths.get(position));
                 list_of_files.remove(list_of_files.get(position));
                 gridAdapter.notifyDataSetChanged();
-                // Set result of activity to 0 -> One pic deleted
-                setResult(0);
-            }
-            // The only image of the folder was deleted
-            if(resultCode == 2) {
-                TextView text = findViewById(R.id.placeholderNoImages);
-                text.setText(R.string.no_images);
-                // Set result of activity to 1 -> Folder emptied
-                setResult(1);
-            }
-
-            // The first image of the folder was deleted, need a new thumbnail
-            if(resultCode == 3) {
-                // Set result of activity to 2 -> Thumbnail needs change
+                // One pic deleted
                 setResult(2);
             }
-        }else if (requestCode == 2){
-            if(resultCode == 1) {
-                // One video was deleted
+            // The only image of the folder was deleted
+            else if(resultCode == 2) {
+                text.setText(R.string.no_images);
+                // Folder emptied
+                setResult(1);
+            }
+            // The first image of the folder was deleted, need a new thumbnail
+            else if(resultCode == 3) {
+                // Thumbnail needs change
+                setResult(2);
+            }
+            // UI needs to be reloaded
+            else if(resultCode == 4) {
+                // One image was renamed
                 int position = data.getIntExtra("file", 0);
                 list_of_paths.remove(list_of_paths.get(position));
                 list_of_files.remove(list_of_files.get(position));
                 gridAdapter.notifyDataSetChanged();
-                // Set result of activity to 0 -> One video deleted
-                setResult(0);
+                // Reload
+                loadImages(folder, columns);
+                setResult(2);
+            }
+            // Simple UI refresh
+            else if(resultCode == 5) {
+                // Reload
+                loadImages(folder, columns);
+                setResult(2);
+            }
+        }else if (requestCode == 2){
+            if(resultCode == 1) {
+                // One video was deleted/renamed
+                int position = data.getIntExtra("file", 0);
+                list_of_paths.remove(list_of_paths.get(position));
+                list_of_files.remove(list_of_files.get(position));
+                gridAdapter.notifyDataSetChanged();
+                // Reload
+                loadImages(folder, columns);
+                // Set result
+                setResult(2);
             }
         }
     }

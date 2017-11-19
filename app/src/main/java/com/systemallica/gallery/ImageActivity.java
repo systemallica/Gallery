@@ -21,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -103,7 +104,7 @@ public class ImageActivity extends AppCompatActivity {
             public void onPageSelected(int position) {
                 // Set title to current image's name
                 positionArray = mPager.getCurrentItem();
-                toolbar.setTitle(new File(list_of_images.get(positionArray)).getName());
+                toolbar.setTitle(Utils.getBaseName(new File(list_of_images.get(positionArray))));
             }
 
             @Override
@@ -146,6 +147,14 @@ public class ImageActivity extends AppCompatActivity {
             if(resultCode == 1) {
                 // Update UI
                 deleteVideo();
+            }else if(resultCode == 2) {
+                // Change toolbar text
+                String name = data.getStringExtra("name");
+                Toolbar toolbar = findViewById(R.id.toolbar);
+                toolbar.setTitle(name);
+                mPagerAdapter.notifyDataSetChanged();
+                // Reload images when leaving activity
+                setResult(5);
             }
         }
     }
@@ -328,6 +337,10 @@ public class ImageActivity extends AppCompatActivity {
                 deleteImage(file);
                 return true;
 
+            case R.id.action_rename:
+                renameFile(file);
+                return true;
+
             case R.id.action_details:
                 showDetails(file);
                 return true;
@@ -337,7 +350,62 @@ public class ImageActivity extends AppCompatActivity {
         }
     }
 
-    void showDetails(final File image){
+    private void renameFile(final File file){
+
+        runOnUiThread(new Runnable() {
+            public void run() {
+
+                // Inflate layout and get views
+                LayoutInflater inflater = getLayoutInflater();
+                View layout = inflater.inflate(R.layout.rename_dialog, null);
+                TextView old_name = layout.findViewById(R.id.old_name);
+                final EditText new_name = layout.findViewById(R.id.new_name);
+
+                String set = "Old name: " + Utils.getBaseName(file);
+                old_name.setText(set);
+
+                // Create and show dialog
+                AlertDialog.Builder builder = new AlertDialog.Builder(ImageActivity.this);
+                builder.setView(layout)
+                        .setTitle(R.string.rename_rename)
+                        .setPositiveButton(R.string.action_ok, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Change toolbar text
+                                Toolbar toolbar = findViewById(R.id.toolbar);
+                                toolbar.setTitle(new_name.getText().toString());
+                                // Build path with new name
+                                String newName;
+                                String folderPath = file.getParentFile().getPath();
+                                newName = folderPath + "/" + new_name.getText().toString() + Utils.getExtension(file);
+                                // Rename the file and set activity result
+                                if(file.renameTo(new File(newName))){
+                                    //Remove image from MediaStore
+                                    sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)));
+                                    //Add new file to MediaStore
+                                    sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(new File(newName))));
+                                    // Send intent
+                                    Intent intent = new Intent();
+                                    intent.putExtra("file", positionArray);
+                                    // Set result of activity
+                                    setResult(4, intent);
+                                }
+                            }
+                        })
+                        .setNegativeButton(R.string.action_cancel, new DialogInterface.OnClickListener() {
+                             public void onClick(DialogInterface dialog, int which) {
+                                // Close AlertDialog
+                            }
+                        });
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
+
+            }
+        });
+
+    }
+
+    private void showDetails(final File image){
         runOnUiThread(new Runnable() {
             public void run() {
 
@@ -392,7 +460,7 @@ public class ImageActivity extends AppCompatActivity {
                 builder.setView(layout)
                         .setTitle(R.string.details_image)
                         .setIcon(R.drawable.ic_information_outline_black_48dp)
-                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        .setPositiveButton(R.string.action_ok, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 // Close AlertDialog
                             }

@@ -16,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.android.exoplayer2.ExoPlayerFactory;
@@ -40,6 +41,9 @@ import java.util.Calendar;
 import java.util.Formatter;
 import java.util.GregorianCalendar;
 import java.util.Locale;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class VideoActivity extends AppCompatActivity {
 
@@ -69,21 +73,20 @@ public class VideoActivity extends AppCompatActivity {
     };
     private boolean mVisible;
 
-    private SimpleExoPlayerView playerView;
     private SimpleExoPlayer player;
     String videoPath;
     int position_intent;
+    @BindView(R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.video_view) SimpleExoPlayerView playerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_video);
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        ButterKnife.bind(this);
         setSupportActionBar(toolbar);
 
         mVisible = true;
-        playerView = findViewById(R.id.video_view);
         playerView.hideController();
 
         Intent intent = getIntent();
@@ -96,7 +99,7 @@ public class VideoActivity extends AppCompatActivity {
             // Display arrow to return to previous activity
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             // Set current title
-            getSupportActionBar().setTitle(new File(videoPath).getName());
+            getSupportActionBar().setTitle(Utils.getBaseName(new File(videoPath)));
         }
 
         // Make navBar translucent
@@ -170,6 +173,10 @@ public class VideoActivity extends AppCompatActivity {
                 deleteVideo(file);
                 return true;
 
+            case R.id.action_rename:
+                renameFile(file);
+                return true;
+
             case R.id.action_details:
                 showDetails(file);
                 return true;
@@ -179,6 +186,60 @@ public class VideoActivity extends AppCompatActivity {
         }
     }
 
+    private void renameFile(final File file){
+
+        runOnUiThread(new Runnable() {
+            public void run() {
+
+                // Inflate layout and get views
+                LayoutInflater inflater = getLayoutInflater();
+                View layout = inflater.inflate(R.layout.rename_dialog, null);
+                TextView old_name = layout.findViewById(R.id.old_name);
+                final EditText new_name = layout.findViewById(R.id.new_name);
+
+                String set = "Old name: " + Utils.getBaseName(file);
+                old_name.setText(set);
+
+                // Create and show dialog
+                AlertDialog.Builder builder = new AlertDialog.Builder(VideoActivity.this);
+                builder.setView(layout)
+                        .setTitle(R.string.rename_rename)
+                        .setPositiveButton(R.string.action_ok, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Change toolbar text
+                                toolbar.setTitle(new_name.getText().toString());
+                                // Build path with new name
+                                String newName;
+                                String folderPath = file.getParentFile().getPath();
+                                newName = folderPath + "/" + new_name.getText().toString() + Utils.getExtension(file);
+                                // Rename the file and set activity result
+                                if(file.renameTo(new File(newName))){
+                                    //Remove image from MediaStore
+                                    sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)));
+                                    //Add new file to MediaStore
+                                    sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(new File(newName))));
+                                    // Send intent
+                                    Intent intent = new Intent();
+                                    intent.putExtra("name", new_name.getText().toString());
+                                    // Set result of activity
+                                    setResult(2, intent);
+                                }
+                            }
+                        })
+                        .setNegativeButton(R.string.action_cancel, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Close AlertDialog
+                            }
+                        });
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
+
+            }
+        });
+
+    }
+
     private void shareVideo(File video){
         final Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.setType("video/*");
@@ -186,7 +247,7 @@ public class VideoActivity extends AppCompatActivity {
         startActivity(Intent.createChooser(shareIntent, "Share image using"));
     }
 
-    void showDetails(final File image){
+    private void showDetails(final File image){
         runOnUiThread(new Runnable() {
             public void run() {
 
@@ -241,7 +302,7 @@ public class VideoActivity extends AppCompatActivity {
                 builder.setView(layout)
                         .setTitle(R.string.details_video)
                         .setIcon(R.drawable.ic_information_outline_black_48dp)
-                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        .setPositiveButton(R.string.action_ok, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 // Close AlertDialog
                             }
