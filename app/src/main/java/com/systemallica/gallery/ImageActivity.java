@@ -40,7 +40,6 @@ import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOption
 public class ImageActivity extends AppCompatActivity {
 
     ArrayList<String> list_of_images = new ArrayList<>();
-    ArrayList<Integer> files_to_delete = new ArrayList<>();
     PagerAdapter mPagerAdapter;
     ViewPager mPager;
     int positionArray;
@@ -141,6 +140,16 @@ public class ImageActivity extends AppCompatActivity {
         hide();
     }
 
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 99) {
+            if(resultCode == 1) {
+                // Update UI
+                deleteVideo();
+            }
+        }
+    }
+
     private void toggle() {
         if (mVisible) {
             hide();
@@ -239,7 +248,7 @@ public class ImageActivity extends AppCompatActivity {
                             intent.putExtra("position", position);
                             intent.putExtra("videoPath", image.getAbsolutePath());
                             // Start activity
-                            startActivityForResult(intent, 2);
+                            startActivityForResult(intent, 99);
                         }
                     });
                     // Set up the user interaction to manually show or hide the system UI.
@@ -259,14 +268,14 @@ public class ImageActivity extends AppCompatActivity {
 
                 }else {
                     // Set up the user interaction to manually show or hide the system UI.
-                    layout.setOnClickListener(new View.OnClickListener() {
+                    imageView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
                             toggle();
                         }
                     });
                 }
-            // Full image display
+                // Full image display
             }else{
                 // Get subSampling view
                 SubsamplingScaleImageView imageView = layout.findViewById(R.id.inside_imageview_sub);
@@ -417,9 +426,9 @@ public class ImageActivity extends AppCompatActivity {
                                     if (image.delete()) {
                                         int move_to;
                                         // Add deleted file position to ArrayList and send it as Extra
-                                        files_to_delete.add(positionArray);
+                                        int fileToDelete = positionArray;
                                         Intent intent = new Intent();
-                                        intent.putIntegerArrayListExtra("files", files_to_delete);
+                                        intent.putExtra("file", fileToDelete);
                                         // Set result of activity to 1 -> File deleted
                                         setResult(1, intent);
                                         //Remove image from MediaStore
@@ -456,6 +465,39 @@ public class ImageActivity extends AppCompatActivity {
                 AlertDialog dialog = builder.create();
                 dialog.show();
 
+            }
+        });
+    }
+
+    private void deleteVideo(){
+
+        runOnUiThread(new Runnable() {
+            public void run() {
+                int move_to;
+                // Add deleted file position to ArrayList and send it as Extra
+                int fileToDelete = positionArray;
+                Intent intent = new Intent();
+                intent.putExtra("file", fileToDelete);
+                // Set result of activity to 1 -> File deleted
+                setResult(1, intent);
+                // Remove image from arrayList
+                list_of_images.remove(positionArray);
+                // Notify data changed
+                mPagerAdapter.notifyDataSetChanged();
+                // Set adapter position
+                if(positionArray != 0){
+                    move_to = positionArray - 1;
+                    mPager.setCurrentItem(move_to, true);
+                }else{
+                    if(list_of_images.size() == 0) {
+                        // Set result of activity to 2 -> Last file of folder was deleted
+                        setResult(2, intent);
+                        finish();
+                    }else{
+                        // Set result of activity to 3 -> First file of folder was deleted -> Need to recalculate folder thumbnail
+                        setResult(3, intent);
+                    }
+                }
             }
         });
     }

@@ -226,20 +226,19 @@ public class FolderActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1) {
-            if(resultCode!=0) {
-                // One or more images were deleted
-                ArrayList<Integer> position = data.getIntegerArrayListExtra("files");
-                for (int i = 0; i < position.size(); i++) {
-                    list_of_paths.remove(list_of_paths.get(position.get(i)));
-                    list_of_files.remove(list_of_files.get(position.get(i)));
-                }
+            if(resultCode == 1) {
+                // One image was deleted
+                int position = data.getIntExtra("file", 0);
+                list_of_paths.remove(list_of_paths.get(position));
+                list_of_files.remove(list_of_files.get(position));
                 gridAdapter.notifyDataSetChanged();
+                // Set result of activity to 0 -> One pic deleted
+                setResult(0);
             }
             // The only image of the folder was deleted
             if(resultCode == 2) {
                 TextView text = findViewById(R.id.placeholderNoImages);
                 text.setText(R.string.no_images);
-
                 // Set result of activity to 1 -> Folder emptied
                 setResult(1);
             }
@@ -248,6 +247,16 @@ public class FolderActivity extends AppCompatActivity {
             if(resultCode == 3) {
                 // Set result of activity to 2 -> Thumbnail needs change
                 setResult(2);
+            }
+        }else if (requestCode == 2){
+            if(resultCode == 1) {
+                // One video was deleted
+                int position = data.getIntExtra("file", 0);
+                list_of_paths.remove(list_of_paths.get(position));
+                list_of_files.remove(list_of_files.get(position));
+                gridAdapter.notifyDataSetChanged();
+                // Set result of activity to 0 -> One video deleted
+                setResult(0);
             }
         }
     }

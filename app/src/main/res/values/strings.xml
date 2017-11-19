@@ -25,7 +25,7 @@
     <string name="delete_ok">Yes</string>
     <string name="delete_no">No</string>
     <string name="delete_title">Warning!</string>
-    <string name="delete_message">This will delete the image forever, are you sure?</string>
+    <string name="delete_message">This will delete the file forever, are you sure?</string>
 
     <string name="ok" translatable="false">OK</string>
     <string name="details_image">Image details</string>

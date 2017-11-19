@@ -358,7 +358,7 @@ public class MainActivity extends AppCompatActivity {
                 list_of_folders.remove(folder_position);
                 gridAdapter.notifyDataSetChanged();
             }
-            if(resultCode == 2) {
+            if(resultCode == 0 || resultCode == 2) {
                 startRefresh();
             }
         }

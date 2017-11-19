@@ -16,7 +16,7 @@
     <string name="delete_ok">Sí</string>
     <string name="delete_no">No</string>
     <string name="delete_title">Atención!</string>
-    <string name="delete_message">La imagen será borrada para siempre, quieres continuar?</string>
+    <string name="delete_message">El archivo será borrado para siempre, quieres continuar?</string>
     <string name="action_about">Sobre la app</string>
     <string name="title_activity_video">Video</string>
     <string name="title_activity_about">Sobre la app</string>

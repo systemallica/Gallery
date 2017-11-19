@@ -166,9 +166,9 @@ public class VideoActivity extends AppCompatActivity {
                 shareVideo(file);
                 return true;
 
-            //case R.id.action_delete:
-            //    deleteImage(file);
-            //    return true;
+            case R.id.action_delete:
+                deleteVideo(file);
+                return true;
 
             case R.id.action_details:
                 showDetails(file);
@@ -248,6 +248,47 @@ public class VideoActivity extends AppCompatActivity {
                         });
                 AlertDialog dialog = builder.create();
                 dialog.show();
+            }
+        });
+    }
+
+    private void deleteVideo(final File video){
+
+        runOnUiThread(new Runnable() {
+            public void run() {
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(VideoActivity.this);
+                builder.setTitle(R.string.delete_title)
+                        .setMessage(R.string.delete_message)
+                        .setIcon(R.drawable.ic_warning_black_24dp)
+                        .setPositiveButton(R.string.delete_ok, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (video.exists()) {
+                                    // Remove file from device
+                                    if (video.delete()) {
+                                        // Add deleted file position and send it as Extra
+                                        int fileToDelete = position_intent;
+                                        Intent intent = new Intent();
+                                        intent.putExtra("file", fileToDelete);
+                                        // Set result of activity to 1 -> File deleted
+                                        setResult(1, intent);
+                                        // Remove image from MediaStore
+                                        sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(new File(videoPath))));
+                                        // Finish activity
+                                        finish();
+                                    }
+                                }
+                            }
+                        })
+                        .setNegativeButton(R.string.delete_no, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Do nothing
+                            }
+                        });
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
+
             }
         });
     }
