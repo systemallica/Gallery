@@ -5,7 +5,7 @@ android {
     buildToolsVersion "27.0.1"
     defaultConfig {
         applicationId "com.systemallica.gallery"
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 27
         versionCode 6
         versionName "1.0.5"
