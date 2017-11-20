@@ -119,7 +119,7 @@ public class ImageActivity extends AppCompatActivity {
             // Hide it by default
             getSupportActionBar().hide();
             // Set current title
-            getSupportActionBar().setTitle(new File(list_of_images.get(position_intent)).getName());
+            getSupportActionBar().setTitle(Utils.getBaseName(new File(list_of_images.get(position_intent))));
         }
 
         // Make navBar translucent
@@ -127,9 +127,6 @@ public class ImageActivity extends AppCompatActivity {
             int translucentBackground = ContextCompat.getColor(this, R.color.translucent_background);
             getWindow().setNavigationBarColor(translucentBackground);
         }
-
-        // Set result to 0 -> No file deleted
-        setResult(0);
 
     }
 
@@ -250,7 +247,6 @@ public class ImageActivity extends AppCompatActivity {
                     overlay.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            Log.e("click", "glide");
                             // Create video intent
                             Intent intent = new Intent(ImageActivity.this, VideoActivity.class);
                             // Pass arrayList of image paths
@@ -377,12 +373,17 @@ public class ImageActivity extends AppCompatActivity {
                                 String newName;
                                 String folderPath = file.getParentFile().getPath();
                                 newName = folderPath + "/" + new_name.getText().toString() + Utils.getExtension(file);
+                                File newFile = new File(newName);
                                 // Rename the file and set activity result
-                                if(file.renameTo(new File(newName))){
+                                if(file.renameTo(newFile)){
                                     //Remove image from MediaStore
                                     sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)));
                                     //Add new file to MediaStore
-                                    sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(new File(newName))));
+                                    sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(newFile)));
+                                    // Reload pager
+                                    list_of_images.remove(positionArray);
+                                    list_of_images.add(positionArray, newFile.getPath());
+                                    mPagerAdapter.notifyDataSetChanged();
                                     // Send intent
                                     Intent intent = new Intent();
                                     intent.putExtra("file", positionArray);
