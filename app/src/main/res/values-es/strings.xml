@@ -11,6 +11,7 @@
     <string name="action_delete">Borrar</string>
     <string name="title_activity_image">Imagen</string>
     <string name="no_images">La carpeta está vacía!</string>
+    <string name="no_media">No se ha encontrado multimedia :(</string>
     <string name="action_share">Compartir</string>
     <string name="action_details">Detalles</string>
     <string name="delete_ok">Sí</string>

@@ -6,6 +6,15 @@
     android:id="@+id/swipelayout"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <TextView
+        android:id="@+id/noMediaText"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/no_media"
+        android:textAlignment="center"
+        android:gravity="center_vertical"
+        android:visibility="gone" />
+
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"

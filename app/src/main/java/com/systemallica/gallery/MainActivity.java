@@ -21,6 +21,7 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -46,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
     GridViewAdapterFolders gridAdapter;
 
     @BindView(R.id.swipelayout) SwipeRefreshLayout swipeLayout;
+    @BindView(R.id.noMediaText) TextView noMediaText;
 
 
     @Override
@@ -200,6 +202,7 @@ public class MainActivity extends AppCompatActivity {
         String path_of_image;
         String path_of_video;
         String folder_name;
+        Boolean isEmpty = false;
 
         // Initialisations
         list_of_folders.clear();
@@ -220,28 +223,32 @@ public class MainActivity extends AppCompatActivity {
                 MediaStore.MediaColumns.DATE_ADDED + " DESC");
 
         if (cursor!= null) {
-            // Get path of image
-            column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-            // Get folder name
-            column_index_folder_name = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
+            if(cursor.getCount()!= 0) {
+                // Get path of image
+                column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+                // Get folder name
+                column_index_folder_name = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
 
-            while (cursor.moveToNext()) {
-                path_of_image = cursor.getString(column_index_data);
-                folder_name = cursor.getString(column_index_folder_name);
+                while (cursor.moveToNext()) {
+                    path_of_image = cursor.getString(column_index_data);
+                    folder_name = cursor.getString(column_index_folder_name);
 
-                if (!list_of_folder_names_i.contains(folder_name)) {
-                    list_of_folder_names_i.add(folder_name);
+                    if (!list_of_folder_names_i.contains(folder_name)) {
+                        list_of_folder_names_i.add(folder_name);
 
-                    File imgFile = new File(path_of_image);
+                        File imgFile = new File(path_of_image);
 
-                    // Get number of pictures in folder
-                    int files_in_folder = imgFile.getParentFile().listFiles(new Utils.MediaFileFilter()).length;
-                    // Add to list
-                    list_of_folders_i.add(new FolderItem(imgFile, folder_name, files_in_folder));
+                        // Get number of pictures in folder
+                        int files_in_folder = imgFile.getParentFile().listFiles(new Utils.MediaFileFilter()).length;
+                        // Add to list
+                        list_of_folders_i.add(new FolderItem(imgFile, folder_name, files_in_folder));
+                    }
                 }
+                // Close the cursor
+                cursor.close();
+            }else{
+                isEmpty = true;
             }
-            // Close the cursor
-            cursor.close();
         }
 
         // Videos-----------------------------------------------------------------------------------
@@ -254,101 +261,110 @@ public class MainActivity extends AppCompatActivity {
                 MediaStore.MediaColumns.DATE_ADDED + " DESC");
 
         if (cursor!= null) {
-            // Get path of video
-            column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-            // Get folder name
-            column_index_folder_name = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.BUCKET_DISPLAY_NAME);
+            if(cursor.getCount()!= 0) {
+                isEmpty = false;
+                // Get path of video
+                column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+                // Get folder name
+                column_index_folder_name = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.BUCKET_DISPLAY_NAME);
 
-            while (cursor.moveToNext()) {
-                path_of_video = cursor.getString(column_index_data);
-                folder_name = cursor.getString(column_index_folder_name);
+                while (cursor.moveToNext()) {
+                    path_of_video = cursor.getString(column_index_data);
+                    folder_name = cursor.getString(column_index_folder_name);
 
-                if (!list_of_folder_names_v.contains(folder_name)) {
-                    list_of_folder_names_v.add(folder_name);
+                    if (!list_of_folder_names_v.contains(folder_name)) {
+                        list_of_folder_names_v.add(folder_name);
 
-                    File imgFile = new File(path_of_video);
+                        File imgFile = new File(path_of_video);
 
-                    // Get number of pictures in folder
-                    int files_in_folder = imgFile.getParentFile().listFiles(new Utils.MediaFileFilter()).length;
-                    // Add to list
-                    list_of_folders_v.add(new FolderItem(imgFile, folder_name, files_in_folder));
-                }
-            }
-            // Close the cursor
-            cursor.close();
-        }
-
-        // Compare the results of both queries and join them together in a single sorted list
-        boolean match;
-
-        // For every folder with videos
-        for(int j=0; j<list_of_folders_v.size(); j++){
-            match = false;
-            // For every folder with images
-            for(int i=0; i< list_of_folders_i.size(); i++){
-                // If the folder contains both videos and images
-                if(list_of_folders_v.get(j).getTitle().equals(list_of_folders_i.get(i).getTitle())){
-                    match = true;
-                    // If the video is more recent than the image
-                    if(list_of_folders_v.get(j).getImage().lastModified() > list_of_folders_i.get(i).getImage().lastModified()){
-                        // Add video to list
-                        list_of_folders.add(list_of_folders_v.get(j));
-                        list_of_folder_names.add(list_of_folders_v.get(j).getTitle());
-                        break;
-                    }else{
-                        // Add image to list
-                        list_of_folders.add(list_of_folders_i.get(i));
-                        list_of_folder_names.add(list_of_folders_i.get(i).getTitle());
-                        break;
+                        // Get number of pictures in folder
+                        int files_in_folder = imgFile.getParentFile().listFiles(new Utils.MediaFileFilter()).length;
+                        // Add to list
+                        list_of_folders_v.add(new FolderItem(imgFile, folder_name, files_in_folder));
                     }
                 }
-            }
-            // If the folder only contains videos
-            if(!match){
-                // Add video to list
-                list_of_folders.add(list_of_folders_v.get(j));
-                list_of_folder_names.add(list_of_folders_v.get(j).getTitle());
-            }
-        }
-        // For every folder with images
-        for(int z=0; z<list_of_folders_i.size(); z++){
-            // If the folder only contains images
-            if(!list_of_folder_names.contains(list_of_folders_i.get(z).getTitle())){
-                // Add image to list
-                list_of_folders.add(list_of_folders_i.get(z));
-                list_of_folder_names.add(list_of_folders_i.get(z).getTitle());
+                // Close the cursor
+                cursor.close();
+            }else{
+                isEmpty = true;
             }
         }
 
-        Collections.sort(list_of_folders, new Utils.SortFoldersByName());
+        if(isEmpty){
+            noMediaText.setVisibility(View.VISIBLE);
+        }else {
+            // Compare the results of both queries and join them together in a single sorted list
+            boolean match;
 
-        // Find GridView to populate
-        gridView = findViewById(R.id.gridView);
-        // Set number of columns
-        gridView.setNumColumns(columns);
-        // Create and set the adapter (context, layout_of_image, list_of_folders)
-        gridAdapter = new GridViewAdapterFolders(MainActivity.this,
-                R.layout.grid_item_layout_folder,
-                list_of_folders,
-                columns);
-        gridView.setAdapter(gridAdapter);
-        gridAdapter.notifyDataSetChanged();
-
-        // OnClick listener
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View v,
-                                    int position, long id) {
-                folder_position = position;
-                // Create intent
-                Intent intent = new Intent(getBaseContext(), FolderActivity.class);
-                intent.putExtra("folder", list_of_folders.get(position).getTitle());
-                // Start activity
-                startActivityForResult(intent, 1);
+            // For every folder with videos
+            for (int j = 0; j < list_of_folders_v.size(); j++) {
+                match = false;
+                // For every folder with images
+                for (int i = 0; i < list_of_folders_i.size(); i++) {
+                    // If the folder contains both videos and images
+                    if (list_of_folders_v.get(j).getTitle().equals(list_of_folders_i.get(i).getTitle())) {
+                        match = true;
+                        // If the video is more recent than the image
+                        if (list_of_folders_v.get(j).getImage().lastModified() > list_of_folders_i.get(i).getImage().lastModified()) {
+                            // Add video to list
+                            list_of_folders.add(list_of_folders_v.get(j));
+                            list_of_folder_names.add(list_of_folders_v.get(j).getTitle());
+                            break;
+                        } else {
+                            // Add image to list
+                            list_of_folders.add(list_of_folders_i.get(i));
+                            list_of_folder_names.add(list_of_folders_i.get(i).getTitle());
+                            break;
+                        }
+                    }
+                }
+                // If the folder only contains videos
+                if (!match) {
+                    // Add video to list
+                    list_of_folders.add(list_of_folders_v.get(j));
+                    list_of_folder_names.add(list_of_folders_v.get(j).getTitle());
+                }
             }
-        });
+            // For every folder with images
+            for (int z = 0; z < list_of_folders_i.size(); z++) {
+                // If the folder only contains images
+                if (!list_of_folder_names.contains(list_of_folders_i.get(z).getTitle())) {
+                    // Add image to list
+                    list_of_folders.add(list_of_folders_i.get(z));
+                    list_of_folder_names.add(list_of_folders_i.get(z).getTitle());
+                }
+            }
 
-        setFABScrollListener();
+            Collections.sort(list_of_folders, new Utils.SortFoldersByName());
+
+            // Find GridView to populate
+            gridView = findViewById(R.id.gridView);
+            // Set number of columns
+            gridView.setNumColumns(columns);
+            // Create and set the adapter (context, layout_of_image, list_of_folders)
+            gridAdapter = new GridViewAdapterFolders(MainActivity.this,
+                    R.layout.grid_item_layout_folder,
+                    list_of_folders,
+                    columns);
+            gridView.setAdapter(gridAdapter);
+            gridAdapter.notifyDataSetChanged();
+
+            // OnClick listener
+            gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View v,
+                                        int position, long id) {
+                    folder_position = position;
+                    // Create intent
+                    Intent intent = new Intent(getBaseContext(), FolderActivity.class);
+                    intent.putExtra("folder", list_of_folders.get(position).getTitle());
+                    // Start activity
+                    startActivityForResult(intent, 1);
+                }
+            });
+
+            setFABScrollListener();
+        }
 
     }
 
