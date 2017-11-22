@@ -21,7 +21,6 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -47,8 +46,6 @@ public class MainActivity extends AppCompatActivity {
     GridViewAdapterFolders gridAdapter;
 
     @BindView(R.id.swipelayout) SwipeRefreshLayout swipeLayout;
-    @BindView(R.id.noMediaText) TextView noMediaText;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +71,9 @@ public class MainActivity extends AppCompatActivity {
                 setFABListener();
                 loadFolders(columns);
             }
+        }else{
+            setFABListener();
+            loadFolders(columns);
         }
 
         // Set on swipe refresh listener
@@ -235,11 +235,14 @@ public class MainActivity extends AppCompatActivity {
 
                     if (!list_of_folder_names_i.contains(folder_name)) {
                         list_of_folder_names_i.add(folder_name);
-
                         File imgFile = new File(path_of_image);
-
-                        // Get number of pictures in folder
-                        int files_in_folder = imgFile.getParentFile().listFiles(new Utils.MediaFileFilter()).length;
+                        // Get number of media in folder
+                        int files_in_folder;
+                        if(imgFile.getParentFile().listFiles(new Utils.MediaFileFilter()) != null) {
+                            files_in_folder = imgFile.getParentFile().listFiles(new Utils.MediaFileFilter()).length;
+                        }else{
+                            files_in_folder = 0;
+                        }
                         // Add to list
                         list_of_folders_i.add(new FolderItem(imgFile, folder_name, files_in_folder));
                     }
@@ -274,11 +277,14 @@ public class MainActivity extends AppCompatActivity {
 
                     if (!list_of_folder_names_v.contains(folder_name)) {
                         list_of_folder_names_v.add(folder_name);
-
                         File imgFile = new File(path_of_video);
-
-                        // Get number of pictures in folder
-                        int files_in_folder = imgFile.getParentFile().listFiles(new Utils.MediaFileFilter()).length;
+                        // Get number of media in folder
+                        int files_in_folder;
+                        if(imgFile.getParentFile().listFiles(new Utils.MediaFileFilter()) != null) {
+                            files_in_folder = imgFile.getParentFile().listFiles(new Utils.MediaFileFilter()).length;
+                        }else{
+                            files_in_folder = 0;
+                        }
                         // Add to list
                         list_of_folders_v.add(new FolderItem(imgFile, folder_name, files_in_folder));
                     }
@@ -291,7 +297,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if(isEmpty){
-            noMediaText.setVisibility(View.VISIBLE);
+            Snackbar.make(findViewById(R.id.main), getString(R.string.no_media), Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
         }else {
             // Compare the results of both queries and join them together in a single sorted list
             boolean match;
@@ -334,9 +341,7 @@ public class MainActivity extends AppCompatActivity {
                     list_of_folder_names.add(list_of_folders_i.get(z).getTitle());
                 }
             }
-
             Collections.sort(list_of_folders, new Utils.SortFoldersByName());
-
             // Find GridView to populate
             gridView = findViewById(R.id.gridView);
             // Set number of columns
@@ -348,7 +353,6 @@ public class MainActivity extends AppCompatActivity {
                     columns);
             gridView.setAdapter(gridAdapter);
             gridAdapter.notifyDataSetChanged();
-
             // OnClick listener
             gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override

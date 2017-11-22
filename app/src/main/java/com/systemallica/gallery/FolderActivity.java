@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -36,7 +37,6 @@ public class FolderActivity extends AppCompatActivity {
     GridViewAdapterImages gridAdapter;
     int columns = 3;
     @BindView(R.id.swipelayout) SwipeRefreshLayout swipeLayout;
-    @BindView(R.id.placeholderNoImages) TextView text;
     @BindView(R.id.gridViewFolder) GridView gridView;
     @BindView(R.id.toolbar) Toolbar toolbar;
 
@@ -163,8 +163,6 @@ public class FolderActivity extends AppCompatActivity {
             // Initialisations
             list_of_files.clear();
             list_of_paths.clear();
-
-            Log.e("test", "load");
 
             // Images-------------------------------------------------------------------------------
 
@@ -294,7 +292,8 @@ public class FolderActivity extends AppCompatActivity {
             }
             // The only image of the folder was deleted
             else if(resultCode == 2) {
-                text.setText(R.string.no_images);
+                Snackbar.make(findViewById(R.id.main), getString(R.string.no_images), Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
                 // Folder emptied
                 setResult(1);
             }
