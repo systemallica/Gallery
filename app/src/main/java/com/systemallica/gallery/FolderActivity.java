@@ -292,7 +292,14 @@ public class FolderActivity extends AppCompatActivity {
             }
             // The only image of the folder was deleted
             else if(resultCode == 2) {
-                Snackbar.make(findViewById(R.id.main), getString(R.string.no_images), Snackbar.LENGTH_LONG)
+                int position = data.getIntExtra("file", 0);
+                list_of_paths.remove(list_of_paths.get(position));
+                list_of_files.remove(list_of_files.get(position));
+                gridAdapter.notifyDataSetChanged();
+                // Reload
+                startRefresh();
+                // Show message
+                Snackbar.make(findViewById(R.id.folder), getString(R.string.no_images), Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
                 // Folder emptied
                 setResult(1);
@@ -310,13 +317,13 @@ public class FolderActivity extends AppCompatActivity {
                 list_of_files.remove(list_of_files.get(position));
                 gridAdapter.notifyDataSetChanged();
                 // Reload
-                loadImages(folder, columns);
+                startRefresh();
                 setResult(2);
             }
             // Simple UI refresh
             else if(resultCode == 5) {
                 // Reload
-                loadImages(folder, columns);
+                startRefresh();
                 setResult(2);
             }
         }else if (requestCode == 2){
@@ -327,7 +334,7 @@ public class FolderActivity extends AppCompatActivity {
                 list_of_files.remove(list_of_files.get(position));
                 gridAdapter.notifyDataSetChanged();
                 // Reload
-                loadImages(folder, columns);
+                startRefresh();
                 // Set result
                 setResult(2);
             }

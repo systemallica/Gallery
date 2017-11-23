@@ -33,7 +33,7 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
 public class MainActivity extends AppCompatActivity {
 
-    final int MY_PERMISSIONS_REQUEST_BOTH= 114;
+    final int MY_PERMISSIONS_REQUEST_BOTH = 114;
     int columns = 2;
     int folder_position;
     ArrayList<FolderItem> list_of_folders = new ArrayList<>();
