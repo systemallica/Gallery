@@ -493,7 +493,6 @@ public class ImageActivity extends AppCompatActivity {
                                 if (image.exists()) {
                                     // Remove file from device
                                     if (image.delete()) {
-                                        int move_to;
                                         // Add deleted file position to ArrayList and send it as Extra
                                         int fileToDelete = positionArray;
                                         Intent intent = new Intent();
@@ -508,16 +507,13 @@ public class ImageActivity extends AppCompatActivity {
                                         mPagerAdapter.notifyDataSetChanged();
                                         // Set adapter position
                                         if(positionArray != 0){
-                                            move_to = positionArray - 1;
+                                            int move_to = positionArray - 1;
                                             mPager.setCurrentItem(move_to, true);
                                         }else{
                                             if(list_of_images.size() == 0) {
                                                 // Set result of activity to 2 -> Last file of folder was deleted
                                                 setResult(2, intent);
                                                 finish();
-                                            }else{
-                                                // Set result of activity to 3 -> First image of folder was deleted -> Need to recalculate folder thumbnail
-                                                setResult(3, intent);
                                             }
                                         }
 
@@ -562,9 +558,6 @@ public class ImageActivity extends AppCompatActivity {
                         // Set result of activity to 2 -> Last file of folder was deleted
                         setResult(2, intent);
                         finish();
-                    }else{
-                        // Set result of activity to 3 -> First file of folder was deleted -> Need to recalculate folder thumbnail
-                        setResult(3, intent);
                     }
                 }
             }

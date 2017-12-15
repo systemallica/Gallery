@@ -281,8 +281,8 @@ public class FolderActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1) {
+            // One image was deleted
             if(resultCode == 1) {
-                // One image was deleted
                 int position = data.getIntExtra("file", 0);
                 list_of_paths.remove(list_of_paths.get(position));
                 list_of_files.remove(list_of_files.get(position));
@@ -303,11 +303,6 @@ public class FolderActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
                 // Folder emptied
                 setResult(1);
-            }
-            // The first image of the folder was deleted, need a new thumbnail
-            else if(resultCode == 3) {
-                // Thumbnail needs change
-                setResult(2);
             }
             // UI needs to be reloaded
             else if(resultCode == 4) {
