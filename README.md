@@ -3,7 +3,10 @@
 
 Gallery is an Android app which allows you to navigate through your device's media in a clean and simple way.
 
-![](https://travis-ci.org/systemallica/Gallery.svg?branch=master)
+
+[![Build Status](https://travis-ci.org/systemallica/Gallery.svg?branch=master)](https://travis-ci.org/systemallica/Gallery)
+
+https://travis-ci.org/systemallica/Gallery.svg?branch=master
 
 ## Features:
 
