@@ -23,7 +23,7 @@ class Utils {
     static class SortFilesByDate implements Comparator<File> {
         @Override
         public int compare(File o1, File o2) {
-            return Long.valueOf(o2.lastModified()).compareTo(o1.lastModified());
+            return Long.compare(o2.lastModified(), o1.lastModified());
         }
     }
 

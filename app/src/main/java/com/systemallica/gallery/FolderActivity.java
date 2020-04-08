@@ -7,12 +7,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,14 +14,18 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class FolderActivity extends AppCompatActivity {
 
@@ -36,15 +34,16 @@ public class FolderActivity extends AppCompatActivity {
     String folder;
     GridViewAdapterImages gridAdapter;
     int columns = 3;
-    @BindView(R.id.swipelayout) SwipeRefreshLayout swipeLayout;
-    @BindView(R.id.gridViewFolder) GridView gridView;
-    @BindView(R.id.toolbar) Toolbar toolbar;
+    SwipeRefreshLayout swipeLayout;
+    GridView gridView;
+    Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_folder);
-        ButterKnife.bind(this);
+
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         // Get name of folder passed with the intent

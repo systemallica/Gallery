@@ -8,14 +8,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,6 +17,15 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
+
+import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
@@ -35,6 +36,7 @@ import java.util.Calendar;
 import java.util.Formatter;
 import java.util.GregorianCalendar;
 import java.util.Locale;
+import java.util.Objects;
 
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
@@ -123,7 +125,7 @@ public class ImageActivity extends AppCompatActivity {
         }
 
         // Make navBar translucent
-        if(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             int translucentBackground = ContextCompat.getColor(this, R.color.translucent_background);
             getWindow().setNavigationBarColor(translucentBackground);
         }
@@ -141,10 +143,10 @@ public class ImageActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 99) {
-            if(resultCode == 1) {
+            if (resultCode == 1) {
                 // Update UI
                 deleteVideo();
-            }else if(resultCode == 2) {
+            } else if (resultCode == 2) {
                 // Change toolbar text
                 String name = data.getStringExtra("name");
                 Toolbar toolbar = findViewById(R.id.toolbar);
@@ -230,15 +232,15 @@ public class ImageActivity extends AppCompatActivity {
             ImageView overlay = layout.findViewById(R.id.outside_imageview);
 
             // Video/gif thumbnail
-            if(Utils.isVideoOrGif(image.getName())){
+            if (Utils.isVideoOrGif(image.getName())) {
                 ImageView imageView = layout.findViewById(R.id.inside_imageview);
-                GlideApp
-                        .with(getApplicationContext())
-                        .load(image)
-                        .transition(withCrossFade())
-                        .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                        .into(imageView);
-                if(Utils.isVideo(image.getName())) {
+                Glide
+                     .with(getApplicationContext())
+                     .load(image)
+                     .transition(withCrossFade())
+                     .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                     .into(imageView);
+                if (Utils.isVideo(image.getName())) {
                     SubsamplingScaleImageView subSampling = layout.findViewById(R.id.inside_imageview_sub);
 
                     // Add overlay
@@ -257,21 +259,21 @@ public class ImageActivity extends AppCompatActivity {
                         }
                     });
                     // Set up the user interaction to manually show or hide the system UI.
-                    subSampling.setOnClickListener(new View.OnClickListener(){
+                    subSampling.setOnClickListener(new View.OnClickListener() {
                         @Override
-                        public void onClick(View v){
+                        public void onClick(View v) {
                             toggle();
                         }
                     });
 
-                    imageView.setOnClickListener(new View.OnClickListener(){
+                    imageView.setOnClickListener(new View.OnClickListener() {
                         @Override
-                        public void onClick(View v){
+                        public void onClick(View v) {
                             toggle();
                         }
                     });
 
-                }else {
+                } else {
                     // Set up the user interaction to manually show or hide the system UI.
                     imageView.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -281,7 +283,7 @@ public class ImageActivity extends AppCompatActivity {
                     });
                 }
                 // Full image display
-            }else{
+            } else {
                 // Get subSampling view
                 SubsamplingScaleImageView imageView = layout.findViewById(R.id.inside_imageview_sub);
                 // Use EXIF rotation
@@ -324,7 +326,7 @@ public class ImageActivity extends AppCompatActivity {
         int id = item.getItemId();
         positionArray = mPager.getCurrentItem();
         File file = new File(list_of_images.get(positionArray));
-        switch(id){
+        switch (id) {
             case R.id.action_share:
                 shareImage(file);
                 return true;
@@ -346,7 +348,7 @@ public class ImageActivity extends AppCompatActivity {
         }
     }
 
-    private void renameFile(final File file){
+    private void renameFile(final File file) {
 
         runOnUiThread(new Runnable() {
             public void run() {
@@ -371,11 +373,11 @@ public class ImageActivity extends AppCompatActivity {
                                 toolbar.setTitle(new_name.getText().toString());
                                 // Build path with new name
                                 String newName;
-                                String folderPath = file.getParentFile().getPath();
+                                String folderPath = Objects.requireNonNull(file.getParentFile()).getPath();
                                 newName = folderPath + "/" + new_name.getText().toString() + Utils.getExtension(file);
                                 File newFile = new File(newName);
                                 // Rename the file and set activity result
-                                if(file.renameTo(newFile)){
+                                if (file.renameTo(newFile)) {
                                     //Remove image from MediaStore
                                     sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)));
                                     //Add new file to MediaStore
@@ -393,7 +395,7 @@ public class ImageActivity extends AppCompatActivity {
                             }
                         })
                         .setNegativeButton(R.string.action_cancel, new DialogInterface.OnClickListener() {
-                             public void onClick(DialogInterface dialog, int which) {
+                            public void onClick(DialogInterface dialog, int which) {
                                 // Close AlertDialog
                             }
                         });
@@ -406,7 +408,7 @@ public class ImageActivity extends AppCompatActivity {
 
     }
 
-    private void showDetails(final File image){
+    private void showDetails(final File image) {
         runOnUiThread(new Runnable() {
             public void run() {
 
@@ -424,23 +426,22 @@ public class ImageActivity extends AppCompatActivity {
                 // Path
                 pathT.setText(image.getPath());
                 // Size
-                Long size = image.length();
-                Double sizeD = size.doubleValue();
+                double sizeD = (double) image.length();
                 String sizeText = " bytes";
-                if(sizeD>1024){
-                    sizeD = sizeD/1024;//KB
+                if (sizeD > 1024) {
+                    sizeD = sizeD / 1024;//KB
                     sizeText = " kB";
-                    if(sizeD>1024){
-                        sizeD = sizeD/1024;//MB
+                    if (sizeD > 1024) {
+                        sizeD = sizeD / 1024;//MB
                         sizeText = " MB";
-                        if(sizeD>1024){
-                            sizeD = sizeD/1024;//GB
+                        if (sizeD > 1024) {
+                            sizeD = sizeD / 1024;//GB
                             sizeText = " GB";
                         }
                     }
                 }
                 Locale current = getResources().getConfiguration().locale;
-                String result = String.format(current,"%.3f", sizeD) + sizeText;
+                String result = String.format(current, "%.3f", sizeD) + sizeText;
                 sizeT.setText(result);
                 // Type
                 String type = Utils.getMimeType(image.getPath());
@@ -472,14 +473,14 @@ public class ImageActivity extends AppCompatActivity {
         });
     }
 
-    private void shareImage(File image){
+    private void shareImage(File image) {
         final Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.setType("image/*");
         shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(image));
         startActivity(Intent.createChooser(shareIntent, "Share image using"));
     }
 
-    private void deleteImage(final File image){
+    private void deleteImage(final File image) {
 
         runOnUiThread(new Runnable() {
             public void run() {
@@ -506,11 +507,11 @@ public class ImageActivity extends AppCompatActivity {
                                         // Notify data changed
                                         mPagerAdapter.notifyDataSetChanged();
                                         // Set adapter position
-                                        if(positionArray != 0){
+                                        if (positionArray != 0) {
                                             int move_to = positionArray - 1;
                                             mPager.setCurrentItem(move_to, true);
-                                        }else{
-                                            if(list_of_images.size() == 0) {
+                                        } else {
+                                            if (list_of_images.size() == 0) {
                                                 // Set result of activity to 2 -> Last file of folder was deleted
                                                 setResult(2, intent);
                                                 finish();
@@ -534,7 +535,7 @@ public class ImageActivity extends AppCompatActivity {
         });
     }
 
-    private void deleteVideo(){
+    private void deleteVideo() {
 
         runOnUiThread(new Runnable() {
             public void run() {
@@ -550,11 +551,11 @@ public class ImageActivity extends AppCompatActivity {
                 // Notify data changed
                 mPagerAdapter.notifyDataSetChanged();
                 // Set adapter position
-                if(positionArray != 0){
+                if (positionArray != 0) {
                     move_to = positionArray - 1;
                     mPager.setCurrentItem(move_to, true);
-                }else{
-                    if(list_of_images.size() == 0) {
+                } else {
+                    if (list_of_images.size() == 0) {
                         // Set result of activity to 2 -> Last file of folder was deleted
                         setResult(2, intent);
                         finish();

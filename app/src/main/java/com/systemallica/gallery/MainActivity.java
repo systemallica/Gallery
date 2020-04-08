@@ -8,13 +8,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,12 +15,20 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Objects;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
@@ -44,14 +45,13 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<String> list_of_folder_names_v = new ArrayList<>();
     GridView gridView;
     GridViewAdapterFolders gridAdapter;
-
-    @BindView(R.id.swipelayout) SwipeRefreshLayout swipeLayout;
+    SwipeRefreshLayout swipeLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
             loadFolders(columns);
         }
 
+        swipeLayout = findViewById(R.id.swipelayout);
         // Set on swipe refresh listener
         swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -124,8 +125,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case R.id.action_about:
                 // Start AboutActivity
-                Intent intent = new Intent(getBaseContext(), AboutActivity.class);
-                startActivity(intent);
+                // TODO
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -133,28 +133,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_BOTH:
-                if(grantResults.length > 0 && grantResults[0] == PERMISSION_GRANTED
-                        && grantResults[1] == PERMISSION_GRANTED) {
-                    setFABListener();
-                    loadFolders(columns);
-                }else if (grantResults.length > 0 && grantResults[1] == PERMISSION_GRANTED){
-                    Snackbar.make(findViewById(R.id.main), "Camera button won't work",
-                            Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                    loadFolders(columns);
-                }else{
-                    Snackbar.make(findViewById(R.id.main), "App can't work... closing",
-                            Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                    System.exit(0);
-                }
+        if (requestCode == MY_PERMISSIONS_REQUEST_BOTH) {
+            if (grantResults.length > 0 && grantResults[0] == PERMISSION_GRANTED
+                    && grantResults[1] == PERMISSION_GRANTED) {
+                setFABListener();
+                loadFolders(columns);
+            } else if (grantResults.length > 0 && grantResults[1] == PERMISSION_GRANTED) {
+                Snackbar.make(findViewById(R.id.main), "Camera button won't work",
+                        Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                loadFolders(columns);
+            } else {
+                Snackbar.make(findViewById(R.id.main), "App can't work... closing",
+                        Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                System.exit(0);
+            }
         }
     }
 
     private void startRefresh(){
-
         swipeLayout.setRefreshing(true);
         // Sleep main thread for better UI feedback
         new DummySleep().execute();
@@ -202,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
         String path_of_image;
         String path_of_video;
         String folder_name;
-        Boolean isEmpty = false;
+        boolean isEmpty = false;
 
         // Initialisations
         list_of_folders.clear();
@@ -238,8 +236,8 @@ public class MainActivity extends AppCompatActivity {
                         File imgFile = new File(path_of_image);
                         // Get number of media in folder
                         int files_in_folder;
-                        if(imgFile.getParentFile().listFiles(new Utils.MediaFileFilter()) != null) {
-                            files_in_folder = imgFile.getParentFile().listFiles(new Utils.MediaFileFilter()).length;
+                        if(Objects.requireNonNull(imgFile.getParentFile()).listFiles(new Utils.MediaFileFilter()) != null) {
+                            files_in_folder = Objects.requireNonNull(imgFile.getParentFile().listFiles(new Utils.MediaFileFilter())).length;
                         }else{
                             files_in_folder = 0;
                         }

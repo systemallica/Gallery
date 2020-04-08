@@ -2,7 +2,6 @@ package com.systemallica.gallery;
 
 import android.app.Activity;
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +9,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
+
+import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import java.io.File;
@@ -21,7 +23,7 @@ import static com.systemallica.gallery.Utils.dpToPx;
 class GridViewAdapterImages extends ArrayAdapter<File> {
     private Context context;
     private int layoutResourceId;
-    private ArrayList data = new ArrayList();
+    private ArrayList data;
     private int columns;
 
     GridViewAdapterImages(Context context, int layoutResourceId, ArrayList<File> data, int n_columns) {
@@ -75,14 +77,14 @@ class GridViewAdapterImages extends ArrayAdapter<File> {
         }
 
         // Set image, thumbnail to 0.1x resolution, center-cropped, cached
-        GlideApp
-                .with(context)
-                .load(item)
-                .thumbnail(0.1f)
-                .centerCrop()
-                .transition(withCrossFade())
-                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                .into(holder.image);
+        Glide
+             .with(context)
+             .load(item)
+             .thumbnail(0.1f)
+             .centerCrop()
+             .transition(withCrossFade())
+             .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+             .into(holder.image);
 
         return row;
     }

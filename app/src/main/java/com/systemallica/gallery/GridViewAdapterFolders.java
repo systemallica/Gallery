@@ -2,7 +2,6 @@ package com.systemallica.gallery;
 
 import android.app.Activity;
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +11,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+
+import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import java.util.ArrayList;
@@ -22,7 +24,7 @@ import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOption
 class GridViewAdapterFolders extends ArrayAdapter<FolderItem> {
     private Context context;
     private int layoutResourceId;
-    private ArrayList data = new ArrayList();
+    private ArrayList data;
     private int columns;
 
     GridViewAdapterFolders(Context context, int layoutResourceId, ArrayList<FolderItem> data, int n_columns) {
@@ -34,7 +36,8 @@ class GridViewAdapterFolders extends ArrayAdapter<FolderItem> {
     }
 
     @Override
-    @NonNull public View getView(int position, View convertView, @NonNull ViewGroup parent) {
+    @NonNull
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         View row = convertView;
         ViewHolder holder;
 
@@ -80,14 +83,14 @@ class GridViewAdapterFolders extends ArrayAdapter<FolderItem> {
             holder.overlay.setVisibility(View.INVISIBLE);
         }
         // Set image, thumbnail to 0.1x resolution, center-cropped, cached
-        GlideApp
-                .with(context)
-                .load(item.getImage())
-                .thumbnail(0.1f)
-                .centerCrop()
-                .transition(withCrossFade())
-                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                .into(holder.image);
+        Glide
+             .with(context)
+             .load(item.getImage())
+             .thumbnail(0.1f)
+             .centerCrop()
+             .transition(withCrossFade())
+             .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+             .into(holder.image);
 
         return row;
     }
