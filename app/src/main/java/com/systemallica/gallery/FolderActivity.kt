@@ -12,14 +12,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.AdapterView.OnItemLongClickListener
-import android.widget.GridView
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.snackbar.Snackbar
 import com.systemallica.gallery.Utils.SortFilesByDate
+import kotlinx.android.synthetic.main.activity_folder.*
 import kotlinx.android.synthetic.main.content_folder.*
 import java.io.File
 import java.util.*
@@ -31,18 +29,12 @@ class FolderActivity : AppCompatActivity() {
     private var folder: String? = null
     private var gridAdapter: GridViewAdapterImages? = null
     private var columns = 3
-    private var swipeLayout: SwipeRefreshLayout? = null
-    private var gridView: GridView? = null
-    private var toolbar: Toolbar? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_folder)
-        toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
-        swipeLayout = findViewById(R.id.swipelayout)
-        gridView = findViewById(R.id.gridView)
 
         // Get name of folder passed with the intent
         val intent = intent
@@ -100,11 +92,11 @@ class FolderActivity : AppCompatActivity() {
     }
 
     private fun startRefresh() {
-        swipeLayout!!.isRefreshing = true
+        swipelayout!!.isRefreshing = true
         // Refresh data
         loadImages(folder, columns)
         // Stop the refreshing indicator
-        swipeLayout!!.isRefreshing = false
+        swipelayout!!.isRefreshing = false
     }
 
     private fun loadImages(folder: String?, columns: Int) {
@@ -166,17 +158,17 @@ class FolderActivity : AppCompatActivity() {
         }
 
         // Set number of columns
-        gridView!!.numColumns = columns
+        gridViewFolder!!.numColumns = columns
         // Create and set the adapter (context, layout_of_image, list_of_images)
         gridAdapter = GridViewAdapterImages(this@FolderActivity,
                 R.layout.grid_item_layout_image,
                 listOfFiles,
                 columns)
-        gridView!!.adapter = gridAdapter
+        gridViewFolder!!.adapter = gridAdapter
         gridAdapter!!.notifyDataSetChanged()
 
         // OnClick listener
-        gridView!!.onItemClickListener = OnItemClickListener { _, _, position, _ ->
+        gridViewFolder!!.onItemClickListener = OnItemClickListener { _, _, position, _ ->
             if (Utils.isVideo(listOfPaths[position])) {
                 // Create video intent
                 val intent = Intent(this@FolderActivity, VideoActivity::class.java)
@@ -190,14 +182,14 @@ class FolderActivity : AppCompatActivity() {
                 val intent = Intent(this@FolderActivity, ImageActivity::class.java)
                 // Pass arrayList of image paths
                 intent.putExtra("position", position)
-                intent.putExtra("list_of_images", listOfPaths)
+                intent.putExtra("listOfImages", listOfPaths)
                 // Start activity
                 startActivityForResult(intent, 1)
             }
         }
 
         // OnLongClick listener
-        gridView!!.onItemLongClickListener = OnItemLongClickListener { _, grid_item, _, _ ->
+        gridViewFolder!!.onItemLongClickListener = OnItemLongClickListener { _, grid_item, _, _ ->
             // Get layout
             val layout = grid_item as ViewGroup
             // Get "check" ImageView

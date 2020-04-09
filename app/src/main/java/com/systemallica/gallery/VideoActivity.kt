@@ -12,15 +12,14 @@ import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
+import kotlinx.android.synthetic.main.activity_video.*
 import kotlinx.android.synthetic.main.rename_dialog.*
 import java.io.File
 import java.util.*
@@ -40,27 +39,26 @@ class VideoActivity : AppCompatActivity() {
         actionBar?.show()
     }
     private var mVisible = false
-    private var toolbar: Toolbar? = null
-    var videoPath: String? = null
-    var position_intent = 0
-    var playerView: PlayerView? = null
-    var player: SimpleExoPlayer? = null
+    private var videoPath: String? = null
+    private var positionIntent = 0
+    private var player: SimpleExoPlayer? = null
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
         setContentView(R.layout.activity_video)
-        toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
         player = SimpleExoPlayer.Builder(this).build()
 
         // Bind the player to the view.
-        playerView!!.player = player
+        video_view!!.player = player
         mVisible = true
-        playerView!!.hideController()
+        video_view!!.hideController()
         val intent = intent
         // Get all the images in the folder
         videoPath = intent.getStringExtra("videoPath")
         // Get position
-        position_intent = intent.getIntExtra("position", 0)
+        positionIntent = intent.getIntExtra("position", 0)
         if (supportActionBar != null) {
             // Display arrow to return to previous activity
             supportActionBar!!.setDisplayHomeAsUpEnabled(true)
@@ -253,7 +251,7 @@ class VideoActivity : AppCompatActivity() {
                             // Remove file from device
                             if (video.delete()) {
                                 // Add deleted file position and send it as Extra
-                                val fileToDelete = position_intent
+                                val fileToDelete = positionIntent
                                 val intent = Intent()
                                 intent.putExtra("file", fileToDelete)
                                 // Set result of activity to 1 -> File deleted
@@ -294,7 +292,7 @@ class VideoActivity : AppCompatActivity() {
     }
 
     private fun hide() {
-        playerView!!.hideController()
+        video_view!!.hideController()
         // Hide UI first
         val actionBar = supportActionBar
         actionBar?.hide()
@@ -306,7 +304,7 @@ class VideoActivity : AppCompatActivity() {
     }
 
     private fun show() {
-        playerView!!.showController()
+        video_view!!.showController()
         // Show the system bar
         window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION)

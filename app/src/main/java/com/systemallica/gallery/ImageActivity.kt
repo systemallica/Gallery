@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.os.StrictMode
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -28,8 +29,9 @@ import java.io.File
 import java.util.*
 
 class ImageActivity : AppCompatActivity() {
+
     var listOfImages = ArrayList<String>()
-    var mPagerAdapter: PagerAdapter? = null
+    private var mPagerAdapter: PagerAdapter? = null
     var positionArray = 0
     private val mHideHandler = Handler()
     private val mHideRunnable = Runnable {
@@ -44,14 +46,21 @@ class ImageActivity : AppCompatActivity() {
         actionBar?.show()
     }
     private var mVisible = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_image)
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
+
+        val builder: StrictMode.VmPolicy.Builder = StrictMode.VmPolicy.Builder()
+        StrictMode.setVmPolicy(builder.build())
+        builder.detectFileUriExposure()
+
         val intent = intent
         // Get all the images in the folder
-        listOfImages = intent.getStringArrayListExtra("listOfImages")
+        listOfImages = intent.getStringArrayListExtra("listOfImages")!!
         // Get position
         val positionIntent = intent.getIntExtra("position", 0)
         // Instantiate a ViewPager and a PagerAdapter.
@@ -373,7 +382,7 @@ class ImageActivity : AppCompatActivity() {
             builder.setTitle(R.string.delete_title)
                     .setMessage(R.string.delete_message)
                     .setIcon(R.drawable.ic_warning_black_24dp)
-                    .setPositiveButton(R.string.delete_ok) { dialog, which ->
+                    .setPositiveButton(R.string.delete_ok) { _, _ ->
                         if (image.exists()) {
                             // Remove file from device
                             if (image.delete()) {
